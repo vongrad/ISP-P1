@@ -58,59 +58,97 @@ public class GameLogic implements IGameLogic {
     // puts the token
     public int decideNextMove() {
         //TODO Write your implementation for this method
-        //int move = GetLeastUsedColumn();
         return 1;
         //return 0;
     }
 
-    private int minimax(int depth){
-        List<Integer> nextMoves = generateMoves();
+    private int Minimax(State state, int depth)
+    {
 
-        return 0;
-    }
 
-    private List<Integer> generateMoves() {
-        List<Integer> nextMoves = new ArrayList<Integer>();// allocate List
-
-        // If gameover, i.e., no next move
-        if (finished) {
-            return nextMoves;   // return empty list
+        if (TermnialState(state)){
+            return Utility(state);
+        }
+        if (depth == 0) {
+            return Evaluate(state);
         }
 
-        // Search for empty cells and add to the List
-        for (int row = 0; row < x; ++row) {
-                if (gameBoard[row][0]==0)
-                    nextMoves.add(row);
+        List<Integer> actions = Actions(state);
+        if (state.get_turn()== Turn.MAX) {
 
-        }
-        return nextMoves;
-    }
-
-/*
-    private int GetLeastUsedColumn() {
-        int[] arrayCount = new int[x];
-        Arrays.fill(arrayCount,0);
-        for (int i=0;i<x;i++)
-            for (int j=0;j<y;j++)
-                if(gameBoard[i][j]!=0) arrayCount[i]+=1;
-       return FindSmallest(arrayCount);
-    }
-
-    public static int FindSmallest (int [] arr1){//start method
-
-        int index = 0;
-        int min = arr1[index];
-        for (int i=1; i<arr1.length; i++){
-
-            if (arr1[i] < min ){
-                min = arr1[i];
-                index = i;
+            int max = Integer.MIN_VALUE;
+            for (Integer action: actions) {
+                State newState = Result(action,state);
+                max = Math.max(max, Minimax(newState,depth--));
             }
 
 
         }
-        return index ;
+        else
+        {
+            int min = Integer.MAX_VALUE;
 
+            for (Integer action: actions) {
+                State newState = Result(action,state);
+                min = Math.max(min, Minimax(newState, depth--));
+            }
+        }
+
+
+
+
+        return 0;
     }
-    */
+
+    private int Evaluate(State state) {
+        return 0;
+    }
+
+    private int Utility(State state) {
+        return 0;
+    }
+
+    /**
+     * Return new state by applying the action to the state. Change the board and change turn ( Max and Min )
+     * @param action
+     * @param state
+     * @return new state
+     */
+    private State Result(Integer action, State state) {
+
+        return null;
+    }
+
+    // Adam Won or Board Full
+    private boolean TermnialState(State state) {
+
+        return true;
+    }
+
+    /**
+     * return the list of avalable action at current state of game
+     * @param state
+     * @return List<Integer>
+     */
+    private List<Integer> Actions(State state)
+    {
+        List<Integer> actions = new ArrayList<Integer>();
+        int[] row = state.get_board()[0];
+        for (int i=0;i<row.length;i++) {
+            if(row[i]==0)actions.add(i);
+        }
+        return actions;
+    }
+
+    private int Evaluation(State state)
+    {
+        return 0;
+    }
+
+
+
+
+
 }
+
+
