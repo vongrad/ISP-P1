@@ -62,7 +62,7 @@ public class GameLogic implements IGameLogic {
         //return 0;
     }
 
-    private int Minimax(State state, int depth)
+    private Action Minimax(State state, int depth)
     {
 
 
@@ -73,13 +73,13 @@ public class GameLogic implements IGameLogic {
             return Evaluate(state);
         }
 
-        List<Integer> actions = Actions(state);
+        List<Action> actions = Actions(state);
         if (state.get_turn()== Turn.MAX) {
 
             int max = Integer.MIN_VALUE;
-            for (Integer action: actions) {
+            for (Action action: actions) {
                 State newState = Result(action,state);
-                max = Math.max(max, Minimax(newState,depth--));
+                max = Math.max(max, Minimax(newState,depth--).get_evaluatedValue());
             }
 
 
@@ -88,24 +88,48 @@ public class GameLogic implements IGameLogic {
         {
             int min = Integer.MAX_VALUE;
 
-            for (Integer action: actions) {
+            for (Action action: actions) {
                 State newState = Result(action,state);
-                min = Math.max(min, Minimax(newState, depth--));
+                min = Math.max(min, Minimax(newState, depth--).get_evaluatedValue());
             }
         }
 
-
-
-
-        return 0;
+        return new Action(0,0);
     }
 
-    private int Evaluate(State state) {
-        return 0;
+    private Action Evaluate(State state) {
+        int[][] array = state.get_board();
+
+        int columns = 10,rows = 6;
+
+        // iterate through dioganals
+        for (int k = 0; k < rows + columns - 1 ; k++)
+        {
+            for (int j = 0; j <= k ; j++)
+            {
+                int i = k - j;
+                //get one sumbol
+                //if (i < rows && j < columns) array[i,j]+ " ";
+            }
+            // row of dioganal is finished. Here I can return an array you apply a method immediately
+
+        }
+        // iterate through other one
+        for (int k = rows -1  ; k > -columns; k--)
+        {
+            for (int j = 0; j <= (rows - 1) - k; j++)
+            {
+                int i = k + j;
+                //same as before
+                //if (i < rows && j < columns && i > -1 ) array[i,j];
+            }
+        }
+        return new Action(0,0);
     }
 
-    private int Utility(State state) {
-        return 0;
+    private Action Utility(State state) {
+
+        return new Action(0,0);
     }
 
     /**
@@ -114,7 +138,7 @@ public class GameLogic implements IGameLogic {
      * @param state
      * @return new state
      */
-    private State Result(Integer action, State state) {
+    private State Result(Action action, State state) {
 
         return null;
     }
@@ -130,12 +154,12 @@ public class GameLogic implements IGameLogic {
      * @param state
      * @return List<Integer>
      */
-    private List<Integer> Actions(State state)
+    private List<Action> Actions(State state)
     {
-        List<Integer> actions = new ArrayList<Integer>();
+        List<Action> actions = new ArrayList<Action>();
         int[] row = state.get_board()[0];
         for (int i=0;i<row.length;i++) {
-            if(row[i]==0)actions.add(i);
+            if(row[i]==0)actions.add(new Action(i,0));
         }
         return actions;
     }
