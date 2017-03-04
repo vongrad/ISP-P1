@@ -97,31 +97,54 @@ public class GameLogic implements IGameLogic {
         return new Action(0,0);
     }
 
+    /**
+     * This method goes through all rows, columns, dioganals, and evaluates the chances to win
+     * @param state
+     * @return the Action which contains evaluated value INTEGER and move itself
+     */
     private Action Evaluate(State state) {
         int[][] array = state.get_board();
+        int columns = x,rows = y;
+        List <String> linesForEvaluation = new ArrayList<>();
 
-        int columns = 10,rows = 6;
-
-        // iterate through dioganals
-        for (int k = 0; k < rows + columns - 1 ; k++)
-        {
-            for (int j = 0; j <= k ; j++)
-            {
-                int i = k - j;
-                //get one sumbol
-                //if (i < rows && j < columns) array[i,j]+ " ";
+        String temp = "";
+        if (columns > 3)
+            for (int k = 0 ; k < rows ; k++) {
+                for (int j = 0; j <columns; j++) {
+                    temp += array[k][j];
+                }
+                linesForEvaluation.add(temp);
+                temp = "";
             }
-            // row of dioganal is finished. Here I can return an array you apply a method immediately
+        if (rows > 3)
+            for (int k = 0 ; k < columns ; k++) {
+                for (int j = 0; j <rows; j++) {
+                    temp += array[k][j];
+                }
+                linesForEvaluation.add(temp);
+                temp = "";
+            }
+        //ignore dioganals if one of the dimensions is smaller than 4
+        if (columns>4 || rows >4) {
+            // iterate through dioganals ( +3 and -3 is because we dont care about first 3 and last 3 dioganals)
+            for (int k = 0 + 3; k < (rows + columns - 1) - 3; k++) {
+                for (int j = 0; j <= k; j++) {
+                    int i = k - j;
+                    if (i < rows && j < columns) temp += array[i][j];
+                }
+                linesForEvaluation.add(temp);
+                temp = "";
+            }
+            // iterate through other one
+            for (int k = (rows - 1) - 3; k > (-columns) + 3; k--) {
+                for (int j = 0; j <= (rows - 1) - k; j++) {
+                    int i = k + j;
+                    //same as before
+                    if (i < rows && j < columns && i > -1 ) temp += array[i][j];
+                }
 
-        }
-        // iterate through other one
-        for (int k = rows -1  ; k > -columns; k--)
-        {
-            for (int j = 0; j <= (rows - 1) - k; j++)
-            {
-                int i = k + j;
-                //same as before
-                //if (i < rows && j < columns && i > -1 ) array[i,j];
+                linesForEvaluation.add(temp);
+                temp = "";
             }
         }
         return new Action(0,0);
