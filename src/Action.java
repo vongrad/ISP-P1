@@ -1,31 +1,37 @@
 /**
  * Created by lema on 03-03-2017.
  */
+
 public class Action {
 
-    private int _coinAction;
+    /**
+     * Column to put the coin to
+     */
+    private int move;
 
-    private int _evaluatedValue;
+    /**
+     * Player who performed this action
+     */
+    private IGameLogic.Winner player;
 
-    public Action(int coinAction, int evaluatedValue) {
-        set_coinAction(coinAction);
-        set_evaluatedValue(evaluatedValue);
+    public Action(int column, IGameLogic.Winner player) {
+        this.move = column;
+        this.player = player;
     }
 
-    public int get_coinAction() {
-        return _coinAction;
+    public int getMove() {
+        return move;
     }
 
-    public void set_coinAction(int _coinAction) {
-        this._coinAction = _coinAction;
+    public void setMove(int column) {
+        this.move = column;
     }
 
-
-    public int get_evaluatedValue() {
-        return _evaluatedValue;
+    public IGameLogic.Winner getPlayer() {
+        return player;
     }
 
-    public void set_evaluatedValue(int _evaluatedValue) {
-        this._evaluatedValue = _evaluatedValue;
+    public void setPlayer(IGameLogic.Winner player) {
+        this.player = player;
     }
 }

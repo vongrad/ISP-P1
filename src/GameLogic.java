@@ -1,3 +1,4 @@
+import com.sun.xml.internal.bind.v2.model.core.WildcardMode;
 import com.sun.xml.internal.fastinfoset.util.CharArray;
 
 import javax.swing.JOptionPane;
@@ -7,12 +8,20 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GameLogic implements IGameLogic {
+
+    private TerminalTester terminalTester;
+
     private int x = 0;
     private int y = 0;
+
     private int playerID;
-    private int lastPlayedID;
+    private int oponentID;
+
     private boolean finished = false;
-    private int[][] gameBoard;
+    private Integer[][] gameBoard;
+
+    private int lastPlayedColumn = 0;
+    private int lastPlayerId;
 
     public GameLogic() {
         //TODO Write your implementation for this method
@@ -20,84 +29,128 @@ public class GameLogic implements IGameLogic {
 
     // Gives the board size and your id
     public void initializeGame(int x, int y, int playerID) {
+
+        terminalTester = new TerminalTester(4);
+
         this.x = x;
         this.y = y;
+
         // indicates ur id
         this.playerID = playerID;
-        // fill board with 0os
-        gameBoard = new int[x][y];
-        for (int i=0;i<x;i++)
-            for (int j=0;j<y;j++)
-                gameBoard[i][j] = 0;
-        //TODO Write your implementation for this method
+        this.oponentID = playerID == Winner.PLAYER1.ordinal() ? Winner.PLAYER2.ordinal() : Winner.PLAYER1.ordinal();
 
+        gameBoard = new Integer[x][y];
+        //TODO Write your implementation for this method
     }
 
 
 
     // checks whether game is finished, called every click basically
     public Winner gameFinished() {
-        //TODO Write your implementation for this method
+
+        if(terminalTester.isTerminal(gameBoard, lastPlayedColumn)) {
+            if(lastPlayerId == Winner.PLAYER1.ordinal()){
+                return Winner.PLAYER1;
+            }
+            return Winner.PLAYER2;
+        };
+
+        // TODO: handle tie
+
         return Winner.NOT_FINISHED;
     }
 
     //Notifies that a token/coin is put in the specified column of      the game board.
 
+    /**
+     * Insert coin at specific location
+     * @param column The column where the coin is inserted.
+     * @param playerID The ID of the current player.
+     */
     public void insertCoin(int column, int playerID) {
-        //TODO Write your implementation for this method
-        //Implementation is done in a way where
-        this.lastPlayedID = playerID;
-        int index = y-1;
-        while (index >= 0){
-            if (gameBoard[column][index] == 0)
-            {
+
+        this.lastPlayedColumn = column;
+        this.lastPlayerId = playerID;
+
+        int index = 0;
+
+        while (index < x){
+            if (gameBoard[column][index] == null) {
                 gameBoard[column][index] = playerID;
                 break;
             }
-            index--;
+            index++;
         }
     }
 
-    // puts the token
     public int decideNextMove() {
-        //TODO Write your implementation for this method
-        return 1;
-        //return 0;
+
+        State state = new State(gameBoard, new Action(lastPlayedColumn, getPlayer(playerID)));
+        state.setPlayer(getPlayer(oponentID));
+
+        Action action = miniMaxDecision(state, 100);
+
+        return action.getMove();
     }
 
-    private Action Minimax(State state, int depth)
-    {
+    private Action miniMaxDecision(State state, int depth) {
 
+        List<Action> actions = Actions(state);
 
-        if (TermnialState(state)){
+        int max = Integer.MIN_VALUE;
+        Action nextAction = null;
+
+        for (Action action :actions) {
+            int value = minValue(Result(action, state), depth--);
+
+            if(value > max) {
+                max = value;
+                nextAction = action;
+            }
+        }
+        return nextAction;
+    }
+
+    private int maxValue(State state, int depth) {
+
+        if(TermnialState(state)) {
             return Utility(state);
         }
+
+        if(depth == 0) {
+            return Evaluate(state);
+        }
+
+        List<Action> actions = Actions(state);
+
+        int utility = Integer.MIN_VALUE;
+
+        for (Action action :actions) {
+            utility = Math.max(utility, minValue(Result(action, state), depth--));
+        }
+
+        return utility;
+    }
+
+    private int minValue(State state, int depth) {
+
+        if(TermnialState(state)) {
+            return Utility(state);
+        }
+
         if (depth == 0) {
             return Evaluate(state);
         }
 
         List<Action> actions = Actions(state);
-        if (state.get_turn()== Turn.MAX) {
 
-            int max = Integer.MIN_VALUE;
-            for (Action action: actions) {
-                State newState = Result(action,state);
-                max = Math.max(max, Minimax(newState,depth--).get_evaluatedValue());
-            }
+        int utility = Integer.MAX_VALUE;
 
-
-        }
-        else
-        {
-            int min = Integer.MAX_VALUE;
-
-            for (Action action: actions) {
-                State newState = Result(action,state);
-                min = Math.max(min, Minimax(newState, depth--).get_evaluatedValue());
-            }
+        for (Action action :actions) {
+            utility = Math.min(utility, maxValue(Result(action, state), depth--));
         }
 
-        return new Action(0,0);
+        return utility;
     }
 
     /**
@@ -105,8 +158,8 @@ public class GameLogic implements IGameLogic {
      * @param state
      * @return the Action which contains evaluated value INTEGER and move itself
      */
-    private Action Evaluate(State state) {
-        int[][] array = state.get_board();
+    private int Evaluate(State state) {
+        Integer[][] array = state.getBoard();
         int columns = x,rows = y;
         List <String> linesForEvaluation = new ArrayList<>();
 
@@ -152,7 +205,7 @@ public class GameLogic implements IGameLogic {
         }
         int evaluatedValue = EvaluateList(linesForEvaluation);
 
-        return new Action(0,0);
+        return 0;
     }
 
     private int EvaluateList(List<String> linesForEvaluation) {
@@ -206,9 +259,16 @@ public class GameLogic implements IGameLogic {
     }
 
 
-    private Action Utility(State state) {
-
-        return new Action(0,0);
+    private int Utility(State state) {
+        if(state.getAction().getPlayer().ordinal() == playerID) {
+            return 1;
+        }
+        else if(state.getAction().getPlayer().ordinal() == oponentID){
+            return -1;
+        }
+        else {
+            return 0;
+        }
     }
 
     /**
@@ -219,26 +279,53 @@ public class GameLogic implements IGameLogic {
      */
     private State Result(Action action, State state) {
 
-        return null;
+        int index = 0;
+
+        Integer[][] board = state.getBoard().clone();
+
+        while (index < x){
+            if (board[action.getMove()][index] == null) {
+                board[action.getMove()][index] = playerID;
+                break;
+            }
+            index++;
+        }
+
+        State newState = new State(board, action);
+
+        if(playerID == action.getPlayer().ordinal()) {
+            newState.setPlayer(getPlayer(oponentID));
+        }
+        else{
+            newState.setPlayer(getPlayer(playerID));
+        }
+
+        return newState;
     }
 
     // Adam Won or Board Full
     private boolean TermnialState(State state) {
-
-        return true;
+        if(terminalTester.isTerminal(state.getBoard(), state.getAction().getMove())) {
+            return true;
+        };
+        return false;
     }
 
     /**
-     * return the list of avalable action at current state of game
+     * return the list of available action at current state of game
      * @param state
      * @return List<Integer>
      */
+
     private List<Action> Actions(State state)
     {
-        List<Action> actions = new ArrayList<Action>();
-        int[] row = state.get_board()[0];
+        List<Action> actions = new ArrayList<>();
+        Integer[] row = state.getBoard()[0];
+
         for (int i=0;i<row.length;i++) {
-            if(row[i]==0)actions.add(new Action(i,0));
+            if(row[i]== null){
+                actions.add(new Action(i, state.getPlayer()));
+            }
         }
         return actions;
     }
@@ -246,6 +333,15 @@ public class GameLogic implements IGameLogic {
     private int Evaluation(State state)
     {
         return 0;
+    }
+
+    private Winner getPlayer(int playerID) {
+        if(playerID == Winner.PLAYER1.ordinal()) {
+            return Winner.PLAYER1;
+        }
+        else{
+            return Winner.PLAYER2;
+        }
     }
 
 

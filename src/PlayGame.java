@@ -4,7 +4,7 @@
 public class PlayGame {
     public static void main(String[] args)
     {
-        String[] param= {"human","GameLogic"};
+        String[] param = {"human","GameLogic","4", "4"};
         ShowGame.main(param);
     }
 

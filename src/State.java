@@ -1,28 +1,44 @@
 /**
  * Created by lema on 02-03-2017.
  */
+
 public class State {
 
-    private int[][] _board;
+    private Integer[][] board;
 
+    private Action action;
 
-    private Turn _turn;
+    /**
+     * Player who will perform an action from this state
+     */
+    private IGameLogic.Winner player;
 
-    public Turn get_turn() {
-        return _turn;
+    public State(Integer[][] board, Action action) {
+        this.board = board;
+        this.action = action;
     }
 
-    public void set_turn(Turn _turn) {
-        this._turn = _turn;
+    public Integer[][] getBoard() {
+        return board;
     }
 
-    public int[][] get_board() {
-        return _board;
+    public void setBoard(Integer[][] board) {
+        this.board = board;
     }
 
-    public void set_board(int[][] _board) {
-        this._board = _board;
+    public Action getAction() {
+        return action;
     }
 
+    public void setAction(Action action) {
+        this.action = action;
+    }
 
+    public IGameLogic.Winner getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(IGameLogic.Winner player) {
+        this.player = player;
+    }
 }
