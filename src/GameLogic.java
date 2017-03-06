@@ -1,6 +1,9 @@
+import com.sun.xml.internal.fastinfoset.util.CharArray;
+
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameLogic implements IGameLogic {
@@ -125,7 +128,7 @@ public class GameLogic implements IGameLogic {
                 temp = "";
             }
         //ignore dioganals if one of the dimensions is smaller than 4
-        if (columns>4 || rows >4) {
+        if (columns>3 && rows >3) {
             // iterate through dioganals ( +3 and -3 is because we dont care about first 3 and last 3 dioganals)
             for (int k = 0 + 3; k < (rows + columns - 1) - 3; k++) {
                 for (int j = 0; j <= k; j++) {
@@ -147,8 +150,61 @@ public class GameLogic implements IGameLogic {
                 temp = "";
             }
         }
+        int evaluatedValue = EvaluateList(linesForEvaluation);
+
         return new Action(0,0);
     }
+
+    private int EvaluateList(List<String> linesForEvaluation) {
+        HashMap<String, Integer> valuesMax = new HashMap<String, Integer>();
+        HashMap<String, Integer> valuesMin = new HashMap<String, Integer>();
+        for (String line: linesForEvaluation)
+        {
+            char[] tempArray = line.toCharArray();
+            char previousChar = '0';
+            int counter = 0;
+            for (int i= 0; i< tempArray.length; i++)
+            {
+                char currentChar = tempArray[i];
+                if (currentChar == previousChar && currentChar != '0' )
+                {
+                    counter++;
+                }
+                else if (currentChar != previousChar && previousChar != '0')
+                {
+                    switch (currentChar) {
+                        case '0':
+                            if (previousChar == '1'){
+
+                            }
+                            else
+                            {
+
+                            }
+                            break;
+                        case '1':
+                            if (previousChar == '1')
+                            {}
+                            else
+                            {}
+                            break;
+                        case '2':
+                            if (previousChar == '1')
+                            {}
+                            else
+                            {}
+                            break;
+                    }
+
+                }
+                else if (true){;}
+
+            }
+        }
+
+        return 0;
+    }
+
 
     private Action Utility(State state) {
 
