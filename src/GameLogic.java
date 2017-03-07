@@ -47,7 +47,6 @@ public class GameLogic implements IGameLogic {
 
     // checks whether game is finished, called every click basically
     public Winner gameFinished() {
-
         if(terminalTester.isTerminal(gameBoard, lastPlayedColumn)) {
             if(lastPlayerId == Winner.PLAYER1.ordinal()){
                 return Winner.PLAYER1;
@@ -91,17 +90,18 @@ public class GameLogic implements IGameLogic {
         Action action = miniMaxDecision(state, 5);
 
         return action.getMove();
+
     }
 
     private Action miniMaxDecision(State state, int depth) {
 
         List<Action> actions = Actions(state);
 
-        int max = Integer.MIN_VALUE;
+        double max = Double.MAX_VALUE;
         Action nextAction = null;
 
         for (Action action :actions) {
-            int value = minValue(Result(action, state), depth--);
+            double value = minValue(Result(action, state), depth--);
 
             if(value > max) {
                 max = value;
@@ -111,7 +111,7 @@ public class GameLogic implements IGameLogic {
         return nextAction;
     }
 
-    private int maxValue(State state, int depth) {
+    private double maxValue(State state, int depth) {
 
         if(TermnialState(state)) {
             return Utility(state);
@@ -123,7 +123,7 @@ public class GameLogic implements IGameLogic {
 
         List<Action> actions = Actions(state);
 
-        int utility = Integer.MIN_VALUE;
+        double utility = Double.MIN_VALUE;
 
         for (Action action :actions) {
             utility = Math.max(utility, minValue(Result(action, state), depth--));
@@ -132,7 +132,7 @@ public class GameLogic implements IGameLogic {
         return utility;
     }
 
-    private int minValue(State state, int depth) {
+    private double minValue(State state, int depth) {
 
         if(TermnialState(state)) {
             return Utility(state);
@@ -144,7 +144,7 @@ public class GameLogic implements IGameLogic {
 
         List<Action> actions = Actions(state);
 
-        int utility = Integer.MAX_VALUE;
+        double utility = Integer.MAX_VALUE;
 
         for (Action action :actions) {
             utility = Math.min(utility, maxValue(Result(action, state), depth--));
@@ -158,7 +158,7 @@ public class GameLogic implements IGameLogic {
      * @param state
      * @return the Action which contains evaluated value INTEGER and move itself
      */
-    private int Evaluate(State state) {
+    private double Evaluate(State state) {
         Integer[][] array = state.getBoard();
         int columns = x,rows = y;
         List <String> linesForEvaluation = new ArrayList<>();
@@ -167,7 +167,12 @@ public class GameLogic implements IGameLogic {
         if (columns > 3)
             for (int k = 0 ; k < rows ; k++) {
                 for (int j = 0; j <columns; j++) {
-                    temp += array[k][j];
+                    if (array[k][j]== null) {
+                        temp += '0';
+                    }
+                    else {
+                        temp += array[k][j];
+                    }
                 }
                 linesForEvaluation.add(temp);
                 temp = "";
@@ -175,7 +180,12 @@ public class GameLogic implements IGameLogic {
         if (rows > 3)
             for (int k = 0 ; k < columns ; k++) {
                 for (int j = 0; j <rows; j++) {
-                    temp += array[k][j];
+                    if (array[j][k]== null) {
+                        temp += '0';
+                    }
+                    else {
+                        temp += array[j][k];
+                    }
                 }
                 linesForEvaluation.add(temp);
                 temp = "";
@@ -186,7 +196,13 @@ public class GameLogic implements IGameLogic {
             for (int k = 0 + 3; k < (rows + columns - 1) - 3; k++) {
                 for (int j = 0; j <= k; j++) {
                     int i = k - j;
-                    if (i < rows && j < columns) temp += array[i][j];
+                    if (i < rows && j < columns)
+                        if (array[i][j]== null) {
+                        temp += '0';
+                        }
+                        else {
+                        temp += array[i][j];
+                        }
                 }
                 linesForEvaluation.add(temp);
                 temp = "";
@@ -196,68 +212,103 @@ public class GameLogic implements IGameLogic {
                 for (int j = 0; j <= (rows - 1) - k; j++) {
                     int i = k + j;
                     //same as before
-                    if (i < rows && j < columns && i > -1 ) temp += array[i][j];
+                    if (i < rows && j < columns && i > -1 )
+                        if (array[i][j]== null) {
+                            temp += '0';
+                        }
+                        else {
+                        temp += array[i][j];
+                        }
                 }
 
                 linesForEvaluation.add(temp);
                 temp = "";
             }
         }
-        int evaluatedValue = EvaluateList(linesForEvaluation);
+        double evaluatedValue = EvaluateList(linesForEvaluation);
 
-        return 0;
+        return evaluatedValue;
     }
 
-    private int EvaluateList(List<String> linesForEvaluation) {
-        HashMap<String, Integer> valuesMax = new HashMap<String, Integer>();
-        HashMap<String, Integer> valuesMin = new HashMap<String, Integer>();
+    private double EvaluateList(List<String> linesForEvaluation) {
+        double valueMax = 0.0;
+        double valueMin = 0.0;
+        char max = '0';
+        char min = '0';
+        if (playerID == 1) {
+            max = '1';
+            min = '2';
+        }
+        else {
+            min = '1';
+            max = '2';
+        }
+
         for (String line: linesForEvaluation)
         {
             char[] tempArray = line.toCharArray();
-            char previousChar = '0';
+            char previousChar = tempArray[0];
             int counter = 0;
-            for (int i= 0; i< tempArray.length; i++)
+            boolean openedFront = false;
+            if (previousChar != '0')
+                counter ++;
+            for (int i= 1; i< tempArray.length; i++)
             {
                 char currentChar = tempArray[i];
-                if (currentChar == previousChar && currentChar != '0' )
-                {
+                if (currentChar == previousChar && currentChar != '0' ) {
                     counter++;
+                    if (i == tempArray.length - 1)
+                        if (currentChar == max)
+                            valueMax += CalculateValue(counter, openedFront, false);
+                        else
+                            valueMin += CalculateValue(counter, openedFront, false);
                 }
-                else if (currentChar != previousChar && previousChar != '0')
+                else if (currentChar != previousChar && previousChar == '0')
                 {
-                    switch (currentChar) {
-                        case '0':
-                            if (previousChar == '1'){
-
-                            }
-                            else
-                            {
-
-                            }
-                            break;
-                        case '1':
-                            if (previousChar == '1')
-                            {}
-                            else
-                            {}
-                            break;
-                        case '2':
-                            if (previousChar == '1')
-                            {}
-                            else
-                            {}
-                            break;
-                    }
-
+                openedFront = true;
+                counter++;
+                    if (i == tempArray.length - 1)
+                        if (currentChar == max)
+                            valueMax += CalculateValue(counter, openedFront, false);
+                        else
+                            valueMin += CalculateValue(counter, openedFront, false);
                 }
-                else if (true){;}
-
+                else if (currentChar != previousChar && currentChar == '0') {
+                    if (previousChar == max)
+                        valueMax += CalculateValue(counter,openedFront,true);
+                    else
+                        valueMin += CalculateValue(counter,openedFront,true);
+                    counter = 0;
+                }
+                else if (currentChar != previousChar && currentChar != '0') {
+                    if (previousChar == max)
+                        valueMax += CalculateValue(counter,openedFront,false);
+                    else
+                        valueMin += CalculateValue(counter,openedFront,false);
+                    counter = 1;
+                    openedFront = false;
+                }
+                previousChar = currentChar;
             }
         }
 
-        return 0;
+
+        //create ratio
+        double result = 0.0;
+        if (valueMax > valueMin)
+            result = 1 - valueMin/valueMax;
+        else
+            result = valueMax/valueMin - 1;
+        //System.out.println("Max: " + valueMax + " Min: " + valueMin + " Result: " + result);
+        return result;
     }
 
+    private int CalculateValue(int counter, boolean openedFront, boolean openedBack){
+        if (!openedBack && !openedFront) return 0;
+        if (openedBack && openedFront) return counter*2;
+        else return counter*2-1;
+
+    }
 
     private int Utility(State state) {
         if(state.getAction().getPlayer().ordinal() == playerID) {
