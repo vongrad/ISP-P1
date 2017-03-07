@@ -116,9 +116,12 @@ public class TerminalTester {
         int maxX = grid.length -1;
         int maxY = grid[maxX].length - 1;
 
-        int normalizer = orientation == Orientation.FORWARD_DIAGONAL ? Math.min(lastY, maxX - x) : Math.min(x, lastY);
+        int normalizer = orientation == Orientation.FORWARD_DIAGONAL ? Math.min(lastY, x) : Math.min(maxX - x, lastY);
 
         x -= normalizer;
+        if (x<0) {
+            System.out.println("X: " + x + " Y: " );
+        }
         int firstY = lastY - normalizer;
 
         Integer player = null;
@@ -129,9 +132,9 @@ public class TerminalTester {
         for(int y = firstY; y <= maxY; y++){
 
             if(x == terminalX || count == this.connectCount) return count == this.connectCount;
-
-            System.out.println("X: " + x + " Y: " + y);
-
+            if (x<0) {
+                System.out.println("X: " + x + " Y: " + y);
+            }
             if(grid[x][y] == player) {
                 count++;
             }

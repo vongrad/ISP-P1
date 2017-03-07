@@ -88,7 +88,7 @@ public class GameLogic implements IGameLogic {
         State state = new State(gameBoard, new Action(lastPlayedColumn, getPlayer(playerID)));
         state.setPlayer(getPlayer(oponentID));
 
-        Action action = miniMaxDecision(state, 100);
+        Action action = miniMaxDecision(state, 5);
 
         return action.getMove();
     }
@@ -281,7 +281,8 @@ public class GameLogic implements IGameLogic {
 
         int index = 0;
 
-        Integer[][] board = state.getBoard().clone();
+        //Integer[][] board = state.getBoard().clone();
+        Integer [][] board = CopyBoard(state.getBoard());
 
         while (index < x){
             if (board[action.getMove()][index] == null) {
@@ -301,6 +302,13 @@ public class GameLogic implements IGameLogic {
         }
 
         return newState;
+    }
+
+    private Integer[][] CopyBoard(Integer[][] board) {
+        Integer [][] myBoard = new Integer[board.length][];
+        for(int i = 0; i < board.length; i++)
+            myBoard[i] = board[i].clone();
+        return myBoard;
     }
 
     // Adam Won or Board Full
