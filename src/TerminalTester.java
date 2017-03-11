@@ -128,7 +128,9 @@ public class TerminalTester {
 
         for(int y = firstY; y <= maxY; y++){
 
-            if(x == terminalX || count == this.connectCount) return count == this.connectCount;
+            if(x == terminalX || count == this.connectCount){
+                return count == this.connectCount;
+            }
 
             System.out.println("X: " + x + " Y: " + y);
 
