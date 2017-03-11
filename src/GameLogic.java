@@ -37,7 +37,7 @@ public class GameLogic implements IGameLogic {
 
         // indicates ur id
         this.playerID = playerID;
-        this.oponentID = playerID == Winner.PLAYER1.ordinal() ? Winner.PLAYER2.ordinal() : Winner.PLAYER1.ordinal();
+        this.oponentID = playerID == 1 ? 2 : 1;
 
         gameBoard = new Integer[x][y];
         //TODO Write your implementation for this method
@@ -48,10 +48,7 @@ public class GameLogic implements IGameLogic {
     // checks whether game is finished, called every click basically
     public Winner gameFinished() {
         if(terminalTester.isTerminal(gameBoard, lastPlayedColumn)) {
-            if(lastPlayerId == Winner.PLAYER1.ordinal()){
-                return Winner.PLAYER1;
-            }
-            return Winner.PLAYER2;
+            getPlayer(lastPlayerId);
         };
 
         // TODO: handle tie
@@ -84,8 +81,8 @@ public class GameLogic implements IGameLogic {
 
     public int decideNextMove() {
 
-        State state = new State(gameBoard, new Action(lastPlayedColumn, getPlayer(playerID)));
-        state.setPlayer(getPlayer(oponentID));
+        State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
+        state.setPlayer(oponentID);
 
         Action action = miniMaxDecision(state, 5);
 
@@ -126,7 +123,7 @@ public class GameLogic implements IGameLogic {
         double utility = Double.MIN_VALUE;
 
         for (Action action :actions) {
-            utility = Math.max(utility, minValue(Result(action, state), depth--));
+            utility = Math.max(utility, minValue(Result(action, state), depth - 1));
         }
 
         return utility;
@@ -147,7 +144,7 @@ public class GameLogic implements IGameLogic {
         double utility = Integer.MAX_VALUE;
 
         for (Action action :actions) {
-            utility = Math.min(utility, maxValue(Result(action, state), depth--));
+            utility = Math.min(utility, maxValue(Result(action, state), depth - 1));
         }
 
         return utility;
@@ -311,10 +308,10 @@ public class GameLogic implements IGameLogic {
     }
 
     private int Utility(State state) {
-        if(state.getAction().getPlayer().ordinal() == playerID) {
+        if(state.getAction().getPlayer() == playerID) {
             return 1;
         }
-        else if(state.getAction().getPlayer().ordinal() == oponentID){
+        else if(state.getAction().getPlayer() == oponentID){
             return -1;
         }
         else {
@@ -335,9 +332,9 @@ public class GameLogic implements IGameLogic {
         //Integer[][] board = state.getBoard().clone();
         Integer [][] board = CopyBoard(state.getBoard());
 
-        while (index < x){
+        while (index < y){
             if (board[action.getMove()][index] == null) {
-                board[action.getMove()][index] = playerID;
+                board[action.getMove()][index] = action.getPlayer();
                 break;
             }
             index++;
@@ -345,11 +342,11 @@ public class GameLogic implements IGameLogic {
 
         State newState = new State(board, action);
 
-        if(playerID == action.getPlayer().ordinal()) {
-            newState.setPlayer(getPlayer(oponentID));
+        if(playerID == action.getPlayer()) {
+            newState.setPlayer(oponentID);
         }
         else{
-            newState.setPlayer(getPlayer(playerID));
+            newState.setPlayer(playerID);
         }
 
         return newState;
@@ -395,7 +392,7 @@ public class GameLogic implements IGameLogic {
     }
 
     private Winner getPlayer(int playerID) {
-        if(playerID == Winner.PLAYER1.ordinal()) {
+        if(playerID - 1 == Winner.PLAYER1.ordinal()) {
             return Winner.PLAYER1;
         }
         else{

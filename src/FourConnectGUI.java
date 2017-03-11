@@ -137,7 +137,7 @@ public class FourConnectGUI extends JComponent implements MouseListener
      * player is prompted to make a move, which is done in a new thread.
      */
     public void mouseClicked(MouseEvent e){
-	if (winner == IGameLogic.Winner.NOT_FINISHED){
+ 	if (winner == IGameLogic.Winner.NOT_FINISHED){
 	    int col=-1;
 	    if (playerTurn == 1) {
             if (player1==null){//human

@@ -12,9 +12,9 @@ public class Action {
     /**
      * Player who performed this action
      */
-    private IGameLogic.Winner player;
+    private int player;
 
-    public Action(int column, IGameLogic.Winner player) {
+    public Action(int column, int player) {
         this.move = column;
         this.player = player;
     }
@@ -27,11 +27,11 @@ public class Action {
         this.move = column;
     }
 
-    public IGameLogic.Winner getPlayer() {
+    public int getPlayer() {
         return player;
     }
 
-    public void setPlayer(IGameLogic.Winner player) {
+    public void setPlayer(int player) {
         this.player = player;
     }
 }

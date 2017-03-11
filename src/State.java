@@ -11,7 +11,7 @@ public class State {
     /**
      * Player who will perform an action from this state
      */
-    private IGameLogic.Winner player;
+    private int player;
 
     public State(Integer[][] board, Action action) {
         this.board = board;
@@ -34,11 +34,11 @@ public class State {
         this.action = action;
     }
 
-    public IGameLogic.Winner getPlayer() {
+    public int getPlayer() {
         return player;
     }
 
-    public void setPlayer(IGameLogic.Winner player) {
+    public void setPlayer(int player) {
         this.player = player;
     }
 }

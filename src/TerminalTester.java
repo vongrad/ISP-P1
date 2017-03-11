@@ -73,14 +73,16 @@ public class TerminalTester {
                 y = i;
             }
 
-            if(grid[x][y] == player) {
+            if(grid[x][y] == player && player != null) {
                 count++;
             }
             else{
                 count = 1;
                 player = grid[x][y];
             }
-            if(count == this.connectCount) return true;
+            if(count == this.connectCount) {
+                return true;
+            }
         }
         return false;
     }
@@ -139,7 +141,7 @@ public class TerminalTester {
 
             System.out.println("X: " + x + " Y: " + y);
 
-            if(grid[x][y] == player) {
+            if(grid[x][y] == player && player != null) {
                 count++;
             }
             else{
