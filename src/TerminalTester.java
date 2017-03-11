@@ -23,7 +23,9 @@ public class TerminalTester {
      * @return
      */
     public boolean isTerminal(Integer[][] grid, int x) {
-        return horizontal(grid, x) || vertical(grid, x) || slashDiagonal(grid, x) || backslashDiagonal(grid, x);
+        boolean term =  horizontal(grid, x) || vertical(grid, x) || slashDiagonal(grid, x) || backslashDiagonal(grid, x);
+        System.out.println("Terminal: " + term);
+        return term;
     }
 
     /**
@@ -116,9 +118,12 @@ public class TerminalTester {
         int maxX = grid.length -1;
         int maxY = grid[maxX].length - 1;
 
-        int normalizer = orientation == Orientation.FORWARD_DIAGONAL ? Math.min(lastY, maxX - x) : Math.min(x, lastY);
+        int normalizer = orientation == Orientation.FORWARD_DIAGONAL ? Math.min(lastY, x) : Math.min(maxX - x, lastY);
 
         x -= normalizer;
+        if (x<0) {
+            System.out.println("X: " + x + " Y: " );
+        }
         int firstY = lastY - normalizer;
 
         Integer player = null;
