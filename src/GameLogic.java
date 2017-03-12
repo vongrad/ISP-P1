@@ -32,19 +32,19 @@ public class GameLogic implements IGameLogic {
     public void initializeGame(int x, int y, int playerID) {
 
         terminalTester = new TerminalTester(4);
-        evaluator = new Evaluator();
 
         //test evaluation
         Integer[][] board = new Integer[][]
                 {       {null,null,null, null, null, null, null, null,2},
-                        {1,   2,   null, null, null, null, null, null,1},
+                        {null, null ,   null, null, null, null, null, null,1},
                         {1,   2,   1,    2,    null, null, null, null,2},
                         {1,   2,   1,    2,    1,    null, null, null,2},
                         {2,   1,   2,    2,    1,    2,    1,    null,1}};
         State state = new State(board, new Action(2, 2));
         state.setPlayer(1);
 
-        evaluator.Evaluate(state);
+        evaluator = new Evaluator(state);
+        evaluator.Evaluate();
 
         this.x = x;
         this.y = y;
@@ -170,8 +170,8 @@ public class GameLogic implements IGameLogic {
      * @return the Action which contains evaluated value INTEGER and move itself
      */
     private double Evaluate(State state) {
-        double evaluatedValue = evaluator.Evaluate(state);
-        return evaluatedValue;
+        Evaluator evaluator = new Evaluator(state);
+        return evaluator.Evaluate();
     }
 
 
