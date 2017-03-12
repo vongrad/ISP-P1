@@ -35,11 +35,11 @@ public class GameLogic implements IGameLogic {
 
         //test evaluation
         Integer[][] board = new Integer[][]
-                {       {null, null, null, null, null, null, null, null,2},
-                        {null, null, null, null, null, null, null, null,1},
-                        {1,    2,   1,     2,    null, null, null, null,2},
-                        {1,    2,   1,     2,    1,    null, null, null,2},
-                        {2,    1,   2,     2,    1,    2,    1,    null,1}};
+                {       {2, null, null, null, null, null, null, null},
+                        {1,    1,    1,    null, null, null, null, null},
+                        {null, null, null, null, null, null, null, null},
+                        {1,    2,    1,    2,    1,    null, null, null},
+                        {2,    1,    2,    2,    1,    2,    2,    null}};
         State state = new State(board, new Action(2, 2));
         state.setPlayer(1);
 

@@ -28,26 +28,36 @@ public class Evaluator {
     }
 
     private void EvaluateRows(){
-        int rowSize  = board[0].length,columnSize = board.length;
+        int y = board[0].length,x  = board.length;
         Integer[] tempArray= new Integer[4];
         boolean containsOne = false;
         boolean containsTwo = false;
-        if (columnSize > 3)
-            for (int y = 0 ; y < rowSize - 3 ; y++) {
-                for (int x = 0; x < columnSize; x++) {
+        if (y > 3)
+            for (int y1 = 0; y1 < y ; y1++) {
+                for (int x1 = 0; x1 < x - 3; x1++) {
                     containsOne = false;
                     containsTwo = false;
-                    for (int index = 0; index <4;index++)
+                    for (int index = 0; index < 4; index++)
                     {
-                        if (board[x][y+index]!= null) {
-                            if (board[x][y + index]==1)
+                        if (board[x1+index][y1]!= null) {
+                            if (board[x1+index][y1]==1)
                                 containsOne = true;
                             else
                                 containsTwo = true;
-                            tempArray[index] = board[x][y+index];
+                            tempArray[index] = board[x1+index][y1];
                         }
                         else
-                            tempArray[index]=0;
+                        {
+                            tempArray[index]=null;
+                            //check if value below is null
+                            if (y1!=0)
+                                if(board[x1+index][y1-1]==null)
+                                {
+                                    containsOne = false;
+                                    containsTwo = false;
+                                    break;
+                                }
+                        }
                     }
                     if (containsOne ^ containsTwo)
                         if (containsOne){
@@ -61,37 +71,35 @@ public class Evaluator {
     }
 
     private void EvaluateColumns(){
-        boolean isPlayerOne = false;
-        boolean isPlayerTwo = false;
+
         Integer[] tempArray = new Integer[4];
-        int rowSize = board.length,columnSize  = board[0].length;
-        if (rowSize > 3)
-            for (int y = 0 ; y < columnSize ; y++) {
+        int y = board[0].length,x  = board.length; 
+        if (x > 3)
+            for (int x1 = x - 1; x1 > -1  ; x1--) {
                 int counter = 0;
                 boolean valueSet = false;
-                if(board[0][y]==null && board[rowSize-1][y]!= null) { //check if first element of a columns is zero or last
-                    for (int x = 0; x < rowSize; x++) {
-                        if (board[x][y] != null) {
+                if(board[x1][0]!=null && board[x1][y - 1]== null) { //check if first element of a columns is zero or last
+                    for (int y1 = y - 1 ; y1 > -1; y1--) {
+                        if (board[x1][y1] != null) {
                             if (!valueSet)
                             {
-                                tempArray[counter]=board[x][y];
+                                tempArray[counter]=board[x1][y1];
                                 valueSet = true;
                             }
                             else
                             {
-                                if (board[x][y]!=tempArray[0]){
+                                if (board[x1][y1]!=tempArray[0]){
                                     break;
                                 }
                                 else
                                 {
                                     counter++;
-                                    tempArray[counter] = board[x][y];
+                                    tempArray[counter] = board[x1][y1];
                                 }
                             }
                         }
                     }
                 }
-
                 evaluationScore.addCount(tempArray,tempArray[0]);
                 tempArray = new Integer[4];
             }
