@@ -21,8 +21,8 @@ public class Evaluator {
     {
         //preparation
 
-        EvaluateColumns();
-        EvaluateRows();
+        //EvaluateColumns();
+        //EvaluateRows();
         diagonal(4);
         return 0;
     }
@@ -127,6 +127,9 @@ public class Evaluator {
             startY = 0;
         }
 
+        // Re-initialize start Y
+        startY = maxY - terminalCount;
+
         // Backslash diagonal
         for(int x = maxX - 1; x >= terminalCount - 1 ; x--) {
             for (int y = startY; y >= 0; y--) {
@@ -153,6 +156,10 @@ public class Evaluator {
 
         Integer player = null;
 
+        int lastX = 0;
+        int lastY = 0;
+
+        segments:
         for(int s = 0; s < segments; s++) {
 
             Integer[] possibility = new Integer[terminalCount];
@@ -163,14 +170,21 @@ public class Evaluator {
                 int x = startX + (s * terminalCount + (orientation == Orientation.FORWARD_DIAGONAL ? i : -i));
                 int y = startY + (s * terminalCount + i);
 
+                if(x == 4 && y == 2) {
+                    String test = "";
+                }
+
+                lastX = x;
+                lastY = y;
+
                 // If the coin cannot be placed on [x, y] because there is nothing at [x, y-1], break
                 if(y > 0 && board[x][y - 1] == null) {
-                    break;
+                    continue segments;
                 }
 
                 // If there are two different players in the segment, break
-                if(player != board[x][y] && player != null) {
-                    break;
+                if(player != board[x][y] && player != null && board[x][y] != null) {
+                    continue segments;
                 }
                 else {
                     if(board[x][y] != null) {
@@ -179,12 +193,10 @@ public class Evaluator {
                     possibility[i] = board[x][y];
                 }
             }
-            if(player==null)
-            {
-                String hello;
-            }
 
-            evaluationScore.addCount(possibility, player);
+            if(player != null) {
+                evaluationScore.addCount(possibility, player);
+            }
         }
 
         // If there are more segments to explore, recursively explore them

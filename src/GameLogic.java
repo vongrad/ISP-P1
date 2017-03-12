@@ -35,11 +35,22 @@ public class GameLogic implements IGameLogic {
 
         //test evaluation
         Integer[][] board = new Integer[][]
+<<<<<<< HEAD
                 {       {2, null, null, null, null, null, null, null},
                         {1,    1,    1,    null, null, null, null, null},
                         {null, null, null, null, null, null, null, null},
                         {1,    2,    1,    2,    1,    null, null, null},
                         {2,    1,    2,    2,    1,    2,    2,    null}};
+=======
+                {       {null, null, null, null, null, null, null, null},
+                        {1,    1,   1,     1,    1,    null, null, null},
+                        {1,    2,   1,     2,    2,    null, null, null},
+                        {1,    2,   1,     1,    1,    null, null, null},
+                        {2,    1,   2,     2,    1,    2,    1,    null}};
+
+
+
+>>>>>>> origin/master
         State state = new State(board, new Action(2, 2));
         state.setPlayer(1);
 
@@ -74,19 +85,19 @@ public class GameLogic implements IGameLogic {
 
     /**
      * Insert coin at specific location
-     * @param column The column where the coin is inserted.
+     * @param x The column where the coin is inserted.
      * @param playerID The ID of the current player.
      */
-    public void insertCoin(int column, int playerID) {
+    public void insertCoin(int x, int playerID) {
 
-        this.lastPlayedColumn = column;
+        this.lastPlayedColumn = x;
         this.lastPlayerId = playerID;
 
         int index = 0;
 
-        while (index < x){
-            if (gameBoard[column][index] == null) {
-                gameBoard[column][index] = playerID;
+        while (index < y){
+            if (gameBoard[x][index] == null) {
+                gameBoard[x][index] = playerID;
                 break;
             }
             index++;
