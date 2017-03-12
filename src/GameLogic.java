@@ -36,17 +36,15 @@ public class GameLogic implements IGameLogic {
 
         //test evaluation
         Integer[][] board = new Integer[][]
-                {       {1, null,null, null},
-                        {1,null,null,null},
-                        {1,null,null,null},
-                        {2,null,null,null},
-                        {1,2,null,null},
-                        {1,2,1,null},
-                        {1,2,1,null}};
+                {       {null,null,null, null, null, null, null, null,2},
+                        {1,   2,   null, null, null, null, null, null,1},
+                        {1,   2,   1,    2,    null, null, null, null,2},
+                        {1,   2,   1,    2,    1,    null, null, null,2},
+                        {2,   1,   2,    2,    1,    2,    1,    null,1}};
         State state = new State(board, new Action(2, 2));
         state.setPlayer(1);
 
-        evaluator.Evaluate(state,true);
+        evaluator.Evaluate(state);
 
         this.x = x;
         this.y = y;
@@ -131,7 +129,7 @@ public class GameLogic implements IGameLogic {
         }
 
         if(depth == 0) {
-            return Evaluate(state,true);
+            return Evaluate(state);
         }
 
         List<Action> actions = Actions(state);
@@ -152,7 +150,7 @@ public class GameLogic implements IGameLogic {
         }
 
         if (depth == 0) {
-            return Evaluate(state,false);
+            return Evaluate(state);
         }
 
         List<Action> actions = Actions(state);
@@ -171,8 +169,8 @@ public class GameLogic implements IGameLogic {
      * @param state
      * @return the Action which contains evaluated value INTEGER and move itself
      */
-    private double Evaluate(State state,boolean isMax) {
-        double evaluatedValue = evaluator.Evaluate(state,isMax);
+    private double Evaluate(State state) {
+        double evaluatedValue = evaluator.Evaluate(state);
         return evaluatedValue;
     }
 

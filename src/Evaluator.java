@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -6,7 +8,6 @@ import java.util.List;
  */
 public class Evaluator {
 
-    private Integer currentPlayersMoveId;
     private Integer maxPlayerId;
     private Integer minPlayerId;
 
@@ -14,61 +15,20 @@ public class Evaluator {
 
     }
 
-    public double Evaluate(State state,boolean isMax)
+    public double Evaluate(State state)
     {
         //preparation
-        currentPlayersMoveId = state.getPlayer();
+        maxPlayerId = state.getPlayer();
+        minPlayerId = 3 - maxPlayerId;
 
-        if (isMax) {
-            maxPlayerId = state.getPlayer();
-            minPlayerId = 3 - maxPlayerId;
-        }
-        else {
-            minPlayerId = state.getPlayer();
-            maxPlayerId = 3 - minPlayerId;
-        }
 
         Integer[][] board = state.getBoard();
-        List<String> columns = GetColumns(board);
-        double columnEvaluationValue = EvaluateColumns(columns);
-        List<String> rows = GetRows(board);
+
+        double rowEvaluationValue = EvaluateRows(board);
+        double columnEvaluationValue = EvaluateColumns(board);
         List<String> dioganals = GetDioganals(board);
-        double rowEvaluationValue = EvaluateRows(rows);
         double dioganalEvaluatrionValue = EvaluateDioganals(dioganals);
         return 0;
-    }
-
-    private double EvaluateColumns(List<String> columns)
-    {
-        double evaluateValue = 0;
-        for(String line: columns)
-        {
-             evaluateValue += EvaluateColumn(line);
-        }
-        return evaluateValue;
-    }
-    private double EvaluateColumn(String column)
-    {
-        char[] columnArray = column.toCharArray();
-        int counter = 0;
-        char foundValue = '0';
-        boolean valueSet = false;
-        for (char coin: columnArray)
-        {
-            if (!valueSet)
-            {
-                foundValue=coin;
-                valueSet = true;
-                counter++;
-            }
-            else
-            {
-                if (coin!=foundValue)
-                    return counter;
-                else counter++;
-            }
-        }
-        return counter;
     }
 
     private double EvaluateRows(List<String> rows)
@@ -87,45 +47,81 @@ public class Evaluator {
     {
         return 0;
     }
-    private List<String> GetRows(Integer[][] board){
-        List<String> rowList = new ArrayList<String>();
-        int rowSize  = board.length,columnSize = board[0].length;
-
-        String temp = "";
+    private double EvaluateRows(Integer[][] board){
+        int rowSize  = board[0].length,columnSize = board.length;
+        Integer[] tempArray= new Integer[4];
+        boolean containsOne = false;
+        boolean containsTwo = false;
         if (columnSize > 3)
-            for (int k = 0 ; k < rowSize ; k++) {
-                for (int j = 0; j <columnSize; j++) {
-                    if (board[k][j]!= null) {
-                        temp += '0';
+            for (int y = 0 ; y < rowSize - 3 ; y++) {
+                for (int x = 0; x < columnSize; x++) {
+                    containsOne = false;
+                    containsTwo = false;
+                    for (int index = 0; index <4;index++)
+                    {
+                        if (board[x][y+index]!= null) {
+                            if (board[x][y + index]==1)
+                                containsOne = true;
+                            else
+                                containsTwo = true;
+                            tempArray[index] = 1;
+                        }
+                        else
+                            tempArray[index]=0;
                     }
-                    else {
-                        temp += board[k][j];
-                    }
+                    if (containsOne ^ containsTwo)
+                        if (containsOne){
+                        //AmasMethod(tempArray,1);
+                        }
+                        else{
+                        //AdamsMethod(tempArray,2);
+                        }
                 }
-                rowList.add(temp);
-                temp = "";
             }
-        return rowList;
+        return 0;
     }
 
-    private List<String> GetColumns(Integer[][] board){
-        List<String> columnList = new ArrayList<>();
+    private double EvaluateColumns(Integer[][] board){
+        HashMap<Integer, Integer> maxValues = new HashMap();
+        maxValues.put(1, 0);
+        maxValues.put(2, 0);
+        maxValues.put(3, 0);
+        HashMap<Integer, Integer> minValues= new HashMap();;
+        minValues.put(1, 0);
+        minValues.put(2, 0);
+        minValues.put(3, 0);
         int rowSize = board.length,columnSize  = board[0].length;
-
-        String temp = "";
         if (rowSize > 3)
-            for (int k = 0 ; k < columnSize ; k++) {
-                if(board[0][k]==null) { //check if first element of a columns is zero or lasat
-                    for (int j = 0; j < rowSize; j++) {
-                        if (board[j][k] != null) {
-                            temp += board[j][k];
+            for (int y = 0 ; y < columnSize ; y++) {
+                int counter = 1;
+                Integer foundValue = 0;
+                boolean valueSet = false;
+                if(board[0][y]==null && board[rowSize-1][y]!= null) { //check if first element of a columns is zero or lasat
+                    for (int x = 0; x < rowSize; x++) {
+                        if (board[x][y] != null) {
+                            if (!valueSet)
+                            {
+                                foundValue=board[x][y];
+                                valueSet = true;
+                            }
+                            else
+                            {
+                                counter++;
+                                if (board[x][y]!=foundValue){
+                                    counter--;
+                                    break;
+                                }
+                            }
                         }
                     }
-                    columnList.add(temp);
-                    temp = "";
+                    if(foundValue == maxPlayerId)
+                        maxValues.put(counter, maxValues.get(counter) + 1);
+                    else
+                        minValues.put(counter, minValues.get(counter) + 1);
                 }
             }
-        return columnList;
+
+        return 0;
     }
 
     private List<String> GetDioganals(Integer[][] board){
@@ -134,31 +130,31 @@ public class Evaluator {
         String temp = "";
         if (columnSize>3 && rowSize >3) {
             // iterate through dioganals ( +3 and -3 is because we dont care about first 3 and last 3 dioganals)
-            for (int k = 0 + 3; k < (rowSize + columnSize - 1) - 3; k++) {
-                for (int j = 0; j <= k; j++) {
-                    int i = k - j;
-                    if (i < rowSize && j < columnSize)
-                        if (board[i][j]== null) {
+            for (int x = 0 + 3; x < (rowSize + columnSize - 1) - 3; x++) {
+                for (int y = 0; y <= x; y++) {
+                    int normalizer = x - y;
+                    if (normalizer < rowSize && y < columnSize)
+                        if (board[normalizer][y]== null) {
                             temp += '0';
                         }
                         else {
-                            temp += board[i][j];
+                            temp += board[normalizer][y];
                         }
                 }
                 diogonalList.add(temp);
                 temp = "";
             }
             // iterate through other one
-            for (int k = (rowSize - 1) - 3; k > (-columnSize) + 3; k--) {
-                for (int j = 0; j <= (rowSize - 1) - k; j++) {
-                    int i = k + j;
+            for (int x = (rowSize - 1) - 3; x > (-columnSize) + 3; x--) {
+                for (int y = 0; y <= (rowSize - 1) - x; y++) {
+                    int normalizer = x + y;
                     //same as before
-                    if (i < rowSize && j < columnSize && i > -1 && j > -1)
-                        if (board[i][j]== null) {
+                    if (normalizer < rowSize && y < columnSize && normalizer > -1 && y > -1)
+                        if (board[normalizer][y]== null) {
                             temp += '0';
                         }
                         else {
-                            temp += board[i][j];
+                            temp += board[normalizer][y];
                         }
                 }
 
@@ -169,6 +165,7 @@ public class Evaluator {
 
         return diogonalList;
     }
+
 
 
 }
