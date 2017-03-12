@@ -44,7 +44,12 @@ public class EvaluationScore {
         StringBuilder sb = new StringBuilder();
 
         for (Integer i: possibility) {
-            sb.append(i);
+            if(i == null) {
+                sb.append(0);
+            }
+            else{
+                sb.append(1);
+            }
         }
         return sb.toString();
     }
