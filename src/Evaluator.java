@@ -26,6 +26,10 @@ public class Evaluator {
 
         EvaluateColumns(board);
         EvaluateRows(board);
+
+
+        diagonal(4);
+
         return 0;
     }
 
@@ -167,7 +171,9 @@ public class Evaluator {
                     break;
                 }
                 else {
-                    player = board[x][y];
+                    if(board[x][y] != null) {
+                        player = board[x][y];
+                    }
                     possibility[i] = board[x][y];
                 }
             }
@@ -176,10 +182,9 @@ public class Evaluator {
 
         // If there are more segments to explore, recursively explore them
         if(startX + terminalCount <= maxX && startY + terminalCount <= maxX) {
-            checkDiagonal(board, startX + 1, startY + 1, terminalCount, score, orientation);
+            checkDiagonal(startX + 1, startY + 1, terminalCount, score, orientation);
         }
     }
-
 
 
 
