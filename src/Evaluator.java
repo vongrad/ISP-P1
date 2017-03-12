@@ -10,43 +10,25 @@ public class Evaluator {
 
     private Integer maxPlayerId;
     private Integer minPlayerId;
+    private Integer[][] board;
+    private EvaluationScore evaluationScore;
 
-    public Evaluator(){
-
-    }
-
-    public double Evaluate(State state)
-    {
-        //preparation
+    public Evaluator(State state){
         maxPlayerId = state.getPlayer();
         minPlayerId = 3 - maxPlayerId;
+        board = state.getBoard();
+        evaluationScore = new EvaluationScore(maxPlayerId,minPlayerId);
+    }
 
+    public double Evaluate()
+    {
+        //preparation
 
-        Integer[][] board = state.getBoard();
-
-        double rowEvaluationValue = EvaluateRows(board);
         double columnEvaluationValue = EvaluateColumns(board);
-        List<String> dioganals = GetDioganals(board);
-        double dioganalEvaluatrionValue = EvaluateDioganals(dioganals);
+        double rowEvaluationValue = EvaluateRows(board);
         return 0;
     }
 
-    private double EvaluateRows(List<String> rows)
-    {
-        return 0;
-    }
-    private double EvaluateRow(String row)
-    {
-        return 0;
-    }
-    private double EvaluateDioganals(List<String> dioganals)
-    {
-        return 0;
-    }
-    private double EvaluateDioganal(String dioganal)
-    {
-        return 0;
-    }
     private double EvaluateRows(Integer[][] board){
         int rowSize  = board[0].length,columnSize = board.length;
         Integer[] tempArray= new Integer[4];
@@ -71,10 +53,10 @@ public class Evaluator {
                     }
                     if (containsOne ^ containsTwo)
                         if (containsOne){
-                        //AmasMethod(tempArray,1);
+                            evaluationScore.addCount(tempArray,1);
                         }
                         else{
-                        //AdamsMethod(tempArray,2);
+                            evaluationScore.addCount(tempArray,2);
                         }
                 }
             }
@@ -120,51 +102,18 @@ public class Evaluator {
                         minValues.put(counter, minValues.get(counter) + 1);
                 }
             }
-
-        return 0;
+        //Evaluate rows
+        if (maxValues.get(3)>0) return 1;
+        if (minValues.get(3)>1) return -1;
+        double maxValue = maxValues.get(2) * 2 + maxValues.get(1) * 1;
+        double minValue = minValues.get(3) * 3 + minValues.get(2) * 2  + minValues.get(1);
+        if (maxValue>minValue)
+            return minValue/maxValue;
+        else
+            return -(maxValue/minValue);
     }
 
-    private List<String> GetDioganals(Integer[][] board){
-        List<String> diogonalList = new ArrayList<>();
-        int rowSize = board.length, columnSize  = board[0].length;
-        String temp = "";
-        if (columnSize>3 && rowSize >3) {
-            // iterate through dioganals ( +3 and -3 is because we dont care about first 3 and last 3 dioganals)
-            for (int x = 0 + 3; x < (rowSize + columnSize - 1) - 3; x++) {
-                for (int y = 0; y <= x; y++) {
-                    int normalizer = x - y;
-                    if (normalizer < rowSize && y < columnSize)
-                        if (board[normalizer][y]== null) {
-                            temp += '0';
-                        }
-                        else {
-                            temp += board[normalizer][y];
-                        }
-                }
-                diogonalList.add(temp);
-                temp = "";
-            }
-            // iterate through other one
-            for (int x = (rowSize - 1) - 3; x > (-columnSize) + 3; x--) {
-                for (int y = 0; y <= (rowSize - 1) - x; y++) {
-                    int normalizer = x + y;
-                    //same as before
-                    if (normalizer < rowSize && y < columnSize && normalizer > -1 && y > -1)
-                        if (board[normalizer][y]== null) {
-                            temp += '0';
-                        }
-                        else {
-                            temp += board[normalizer][y];
-                        }
-                }
 
-                diogonalList.add(temp);
-                temp = "";
-            }
-        }
-
-        return diogonalList;
-    }
 
 
 
