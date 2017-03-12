@@ -25,11 +25,11 @@ public class Evaluator {
         //preparation
 
         double columnEvaluationValue = EvaluateColumns(board);
-        double rowEvaluationValue = EvaluateRows(board);
+        EvaluateRows(board);
         return 0;
     }
 
-    private double EvaluateRows(Integer[][] board){
+    private void EvaluateRows(Integer[][] board){
         int rowSize  = board[0].length,columnSize = board.length;
         Integer[] tempArray= new Integer[4];
         boolean containsOne = false;
@@ -60,7 +60,6 @@ public class Evaluator {
                         }
                 }
             }
-        return 0;
     }
 
     private double EvaluateColumns(Integer[][] board){
@@ -111,6 +110,87 @@ public class Evaluator {
             return minValue/maxValue;
         else
             return -(maxValue/minValue);
+    }
+
+    /**
+     * Get score for both players in both diagonal directions
+     * @param terminalCount - number of coins in a row for a winning state
+     * @return
+     */
+    public void diagonal(int terminalCount) {
+
+        int maxX = board.length;
+        int maxY = board[0].length;
+
+        int startY = maxY - terminalCount;
+
+        // Slash diagonal
+        for(int x = 0; x <= maxX - terminalCount; x++) {
+            for(int y = startY; y >= 0; y--) {
+                checkDiagonal(x, y, terminalCount, evaluationScore, Orientation.FORWARD_DIAGONAL);
+            }
+            // The initial run (X0), we start from Y top and decrement it to Y0, for the subsequent runs, we only do check Y0
+            startY = 0;
+        }
+
+        // Backslash diagonal
+        for(int x = maxX - 1; x >= terminalCount - 1 ; x--) {
+            for (int y = startY; y >= 0; y--) {
+                checkDiagonal(x, y, terminalCount, evaluationScore, Orientation.BACKWARD_DIAGONAL);
+            }
+            startY = 0;
+        }
+    }
+
+    /**
+     * Get all possible moves for both players in the given diagonal
+     * @param startX - starting X of the diagonal
+     * @param startY - starting Y of the diagonal
+     * @param terminalCount - number of coins in a row for a winning state
+     * @param score - score holder
+     * @param orientation - SLASH / BACKSLASH DIAGONAL
+     */
+    public void checkDiagonal(int startX, int startY, int terminalCount, EvaluationScore score, Orientation orientation) {
+
+        int maxX = board.length;
+        int maxY = board[0].length;
+
+        // Length of the diagonal
+        int segments = Math.min(Orientation.FORWARD_DIAGONAL == orientation ? maxX - startX : startX + 1, maxY - startY) / terminalCount;
+
+        Integer player = null;
+
+        for(int s = 0; s < segments; s++) {
+
+            Integer[] possibility = new Integer[terminalCount];
+
+            for(int i = 0; i < terminalCount; i++) {
+
+                // Calculate [x, y] relative to the segment
+                int x = startX + (s * terminalCount + (orientation == Orientation.FORWARD_DIAGONAL ? i : -i));
+                int y = startY + (s * terminalCount + i);
+
+                // If the coin cannot be placed on [x, y] because there is nothing at [x, y-1], break
+                if(y > 0 && board[x][y - 1] == null) {
+                    break;
+                }
+
+                // If there are two different players in the segment, break
+                if(player != board[x][y] && player != null) {
+                    break;
+                }
+                else {
+                    player = board[x][y];
+                    possibility[i] = board[x][y];
+                }
+            }
+            score.addCount(possibility, player);
+        }
+
+        // If there are more segments to explore, recursively explore them
+        if(startX + terminalCount <= maxX && startY + terminalCount <= maxX) {
+            checkDiagonal(board, startX + 1, startY + 1, terminalCount, score, orientation);
+        }
     }
 
 
