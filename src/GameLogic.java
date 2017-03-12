@@ -10,6 +10,7 @@ import java.util.List;
 public class GameLogic implements IGameLogic {
 
     private TerminalTester terminalTester;
+    private Evaluator evaluator;
 
     private int x = 0;
     private int y = 0;
@@ -31,6 +32,21 @@ public class GameLogic implements IGameLogic {
     public void initializeGame(int x, int y, int playerID) {
 
         terminalTester = new TerminalTester(4);
+        evaluator = new Evaluator();
+
+        //test evaluation
+        Integer[][] board = new Integer[][]
+                {       {1, null,null, null},
+                        {1,null,null,null},
+                        {1,null,null,null},
+                        {2,null,null,null},
+                        {1,2,null,null},
+                        {1,2,1,null},
+                        {1,2,1,null}};
+        State state = new State(board, new Action(2, 2));
+        state.setPlayer(1);
+
+        evaluator.Evaluate(state,true);
 
         this.x = x;
         this.y = y;
@@ -115,7 +131,7 @@ public class GameLogic implements IGameLogic {
         }
 
         if(depth == 0) {
-            return Evaluate(state);
+            return Evaluate(state,true);
         }
 
         List<Action> actions = Actions(state);
@@ -136,7 +152,7 @@ public class GameLogic implements IGameLogic {
         }
 
         if (depth == 0) {
-            return Evaluate(state);
+            return Evaluate(state,false);
         }
 
         List<Action> actions = Actions(state);
@@ -155,157 +171,14 @@ public class GameLogic implements IGameLogic {
      * @param state
      * @return the Action which contains evaluated value INTEGER and move itself
      */
-    private double Evaluate(State state) {
-        Integer[][] array = state.getBoard();
-        int columns = x,rows = y;
-        List <String> linesForEvaluation = new ArrayList<>();
-
-        String temp = "";
-        if (columns > 3)
-            for (int k = 0 ; k < rows ; k++) {
-                for (int j = 0; j <columns; j++) {
-                    if (array[k][j]== null) {
-                        temp += '0';
-                    }
-                    else {
-                        temp += array[k][j];
-                    }
-                }
-                linesForEvaluation.add(temp);
-                temp = "";
-            }
-        if (rows > 3)
-            for (int k = 0 ; k < columns ; k++) {
-                for (int j = 0; j <rows; j++) {
-                    if (array[j][k]== null) {
-                        temp += '0';
-                    }
-                    else {
-                        temp += array[j][k];
-                    }
-                }
-                linesForEvaluation.add(temp);
-                temp = "";
-            }
-        //ignore dioganals if one of the dimensions is smaller than 4
-        if (columns>3 && rows >3) {
-            // iterate through dioganals ( +3 and -3 is because we dont care about first 3 and last 3 dioganals)
-            for (int k = 0 + 3; k < (rows + columns - 1) - 3; k++) {
-                for (int j = 0; j <= k; j++) {
-                    int i = k - j;
-                    if (i < rows && j < columns)
-                        if (array[i][j]== null) {
-                        temp += '0';
-                        }
-                        else {
-                        temp += array[i][j];
-                        }
-                }
-                linesForEvaluation.add(temp);
-                temp = "";
-            }
-            // iterate through other one
-            for (int k = (rows - 1) - 3; k > (-columns) + 3; k--) {
-                for (int j = 0; j <= (rows - 1) - k; j++) {
-                    int i = k + j;
-                    //same as before
-                    if (i < rows && j < columns && i > -1 )
-                        if (array[i][j]== null) {
-                            temp += '0';
-                        }
-                        else {
-                        temp += array[i][j];
-                        }
-                }
-
-                linesForEvaluation.add(temp);
-                temp = "";
-            }
-        }
-        double evaluatedValue = EvaluateList(linesForEvaluation);
-
+    private double Evaluate(State state,boolean isMax) {
+        double evaluatedValue = evaluator.Evaluate(state,isMax);
         return evaluatedValue;
     }
 
-    private double EvaluateList(List<String> linesForEvaluation) {
-        double valueMax = 0.0;
-        double valueMin = 0.0;
-        char max = '0';
-        char min = '0';
-        if (playerID == 1) {
-            max = '1';
-            min = '2';
-        }
-        else {
-            min = '1';
-            max = '2';
-        }
-
-        for (String line: linesForEvaluation)
-        {
-            char[] tempArray = line.toCharArray();
-            char previousChar = tempArray[0];
-            int counter = 0;
-            boolean openedFront = false;
-            if (previousChar != '0')
-                counter ++;
-            for (int i= 1; i< tempArray.length; i++)
-            {
-                char currentChar = tempArray[i];
-                if (currentChar == previousChar && currentChar != '0' ) {
-                    counter++;
-                    if (i == tempArray.length - 1)
-                        if (currentChar == max)
-                            valueMax += CalculateValue(counter, openedFront, false);
-                        else
-                            valueMin += CalculateValue(counter, openedFront, false);
-                }
-                else if (currentChar != previousChar && previousChar == '0')
-                {
-                openedFront = true;
-                counter++;
-                    if (i == tempArray.length - 1)
-                        if (currentChar == max)
-                            valueMax += CalculateValue(counter, openedFront, false);
-                        else
-                            valueMin += CalculateValue(counter, openedFront, false);
-                }
-                else if (currentChar != previousChar && currentChar == '0') {
-                    if (previousChar == max)
-                        valueMax += CalculateValue(counter,openedFront,true);
-                    else
-                        valueMin += CalculateValue(counter,openedFront,true);
-                    counter = 0;
-                }
-                else if (currentChar != previousChar && currentChar != '0') {
-                    if (previousChar == max)
-                        valueMax += CalculateValue(counter,openedFront,false);
-                    else
-                        valueMin += CalculateValue(counter,openedFront,false);
-                    counter = 1;
-                    openedFront = false;
-                }
-                previousChar = currentChar;
-            }
-        }
 
 
-        //create ratio
-        double result = 0.0;
-        if (valueMax > valueMin)
-            result = 1 - valueMin/valueMax;
-        else
-            result = valueMax/valueMin - 1;
-        //System.out.println("Max: " + valueMax + " Min: " + valueMin + " Result: " + result);
-        return result;
-    }
 
-    private int CalculateValue(int counter, boolean openedFront, boolean openedBack){
-        if (!openedBack && !openedFront) return 0;
-        if (openedBack && openedFront) return counter*2;
-        else return counter*2-1;
-
-    }
 
     private int Utility(State state) {
         if(state.getAction().getPlayer() == playerID) {
