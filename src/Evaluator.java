@@ -11,8 +11,8 @@ public class Evaluator {
     private EvaluationScore evaluationScore;
 
     public Evaluator(State state){
-        maxPlayerId = state.getPlayer();
-        minPlayerId = 3 - maxPlayerId;
+        minPlayerId = state.getPlayer();
+        maxPlayerId = 3 - minPlayerId;
         board = state.getBoard();
         evaluationScore = new EvaluationScore(maxPlayerId,minPlayerId);
     }
@@ -20,11 +20,19 @@ public class Evaluator {
     public double Evaluate()
     {
         //preparation
+        EvaluateColumns();
 
-        //EvaluateColumns();
-        //EvaluateRows();
+        double score = evaluationScore.evaluateState();
+
+        // EvaluateColumns is really fast so we check if we already do not have a definite winning or losing state
+        if (Math.abs(score) == 1) {
+            return score;
+        }
+
+        EvaluateRows();
         diagonal(4);
-        return 0;
+
+        return evaluationScore.evaluateState();
     }
 
     private void EvaluateRows(){
@@ -73,13 +81,16 @@ public class Evaluator {
     private void EvaluateColumns(){
 
         Integer[] tempArray = new Integer[4];
+        int startIndex = 0;
         int y = board[0].length,x  = board.length; 
         if (x > 3)
             for (int x1 = x - 1; x1 > -1  ; x1--) {
                 int counter = 0;
                 boolean valueSet = false;
+                startIndex = 0;
                 if(board[x1][0]!=null && board[x1][y - 1]== null) { //check if first element of a columns is zero or last
                     for (int y1 = y - 1 ; y1 > -1; y1--) {
+                        startIndex++;
                         if (board[x1][y1] != null) {
                             if (!valueSet)
                             {
@@ -100,7 +111,8 @@ public class Evaluator {
                         }
                     }
                 }
-                evaluationScore.addCount(tempArray,tempArray[0]);
+                if (startIndex>4 || (startIndex==x))
+                        evaluationScore.addCount(tempArray,tempArray[0]);
                 tempArray = new Integer[4];
             }
 
@@ -204,8 +216,5 @@ public class Evaluator {
             checkDiagonal(startX + 1, startY + 1, terminalCount, orientation);
         }
     }
-
-
-
 
 }

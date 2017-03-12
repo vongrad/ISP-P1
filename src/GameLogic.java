@@ -34,20 +34,19 @@ public class GameLogic implements IGameLogic {
         terminalTester = new TerminalTester(4);
 
         //test evaluation
-        Integer[][] board = new Integer[][]
-               {       {null, null, null, null, null, null, null, null},
-                        {1,    1,   1,     1,    1,    null, null, null},
-                        {1,    2,   1,     2,    2,    null, null, null},
-                        {1,    2,   1,     1,    1,    null, null, null},
-                        {2,    1,   2,     2,    1,    2,    1,    null}};
-
-
-
-        State state = new State(board, new Action(2, 2));
-        state.setPlayer(1);
-
-        evaluator = new Evaluator(state);
-        evaluator.Evaluate();
+//        Integer[][] board = new Integer[][]
+//               {       {2,  2,  1,   1},
+//                       {1,  1,  1,    2},
+//                       {2,  2,  2,    1},
+//                       {1,  null,      null,      null}};
+//
+//
+//
+//        State state = new State(board, new Action(2, 2));
+//        state.setPlayer(1);
+//
+//        evaluator = new Evaluator(state);
+//        evaluator.Evaluate();
 
         this.x = x;
         this.y = y;
@@ -65,8 +64,8 @@ public class GameLogic implements IGameLogic {
     // checks whether game is finished, called every click basically
     public Winner gameFinished() {
         if(terminalTester.isTerminal(gameBoard, lastPlayedColumn)) {
-            getPlayer(lastPlayerId);
-        };
+            return getPlayer(lastPlayerId);
+        }
 
         // TODO: handle tie
 
@@ -99,9 +98,9 @@ public class GameLogic implements IGameLogic {
     public int decideNextMove() {
 
         State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
-        state.setPlayer(oponentID);
+        state.setPlayer(playerID);
 
-        Action action = miniMaxDecision(state, 5);
+        Action action = miniMaxDecision(state, 8);
 
         return action.getMove();
 
@@ -111,7 +110,7 @@ public class GameLogic implements IGameLogic {
 
         List<Action> actions = Actions(state);
 
-        double max = Double.MAX_VALUE;
+        double max = -2;
         Action nextAction = null;
 
         for (Action action :actions) {
@@ -127,17 +126,19 @@ public class GameLogic implements IGameLogic {
 
     private double maxValue(State state, int depth) {
 
+        System.out.println(depth);
         if(TermnialState(state)) {
             return Utility(state);
         }
 
         if(depth == 0) {
-            return Evaluate(state);
+            double value = Evaluate(state);
+            return value;
         }
 
         List<Action> actions = Actions(state);
 
-        double utility = Double.MIN_VALUE;
+        double utility = -2;
 
         for (Action action :actions) {
             utility = Math.max(utility, minValue(Result(action, state), depth - 1));
@@ -158,7 +159,7 @@ public class GameLogic implements IGameLogic {
 
         List<Action> actions = Actions(state);
 
-        double utility = Integer.MAX_VALUE;
+        double utility =2;
 
         for (Action action :actions) {
             utility = Math.min(utility, maxValue(Result(action, state), depth - 1));
@@ -181,15 +182,15 @@ public class GameLogic implements IGameLogic {
 
 
 
-    private int Utility(State state) {
+    private double Utility(State state) {
         if(state.getAction().getPlayer() == playerID) {
-            return 1;
+            return 1.0;
         }
         else if(state.getAction().getPlayer() == oponentID){
-            return -1;
+            return -1.0;
         }
         else {
-            return 0;
+            return 0.0;
         }
     }
 
@@ -250,11 +251,15 @@ public class GameLogic implements IGameLogic {
     private List<Action> Actions(State state)
     {
         List<Action> actions = new ArrayList<>();
-        Integer[] row = state.getBoard()[0];
+        Integer[][] board = state.getBoard();
 
-        for (int i=0;i<row.length;i++) {
-            if(row[i]== null){
-                actions.add(new Action(i, state.getPlayer()));
+        int x = board.length;
+        int maxY = board[0].length - 1;
+
+        for (int i=0; i < x; i++) {
+
+            if(board[i][maxY] == null){
+                actions.add(new Action(i,  state.getPlayer()));
             }
         }
         return actions;

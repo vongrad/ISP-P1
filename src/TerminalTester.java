@@ -78,7 +78,10 @@ public class TerminalTester {
             }
             else{
                 count = 1;
-                player = grid[x][y];
+
+                if(grid[x][y] != null) {
+                    player = grid[x][y];
+                }
             }
             if(count == this.connectCount) {
                 return true;
@@ -135,7 +138,11 @@ public class TerminalTester {
 
         for(int y = firstY; y <= maxY; y++){
 
-            if(x == terminalX || count == this.connectCount){
+            if(x < 0) {
+                String test = "";
+            }
+
+            if(x <= terminalX || count == this.connectCount){
                 return count == this.connectCount;
             }
 
@@ -145,7 +152,9 @@ public class TerminalTester {
                 count++;
             }
             else{
-                player = grid[x][y];
+                if(grid[x][y] != null) {
+                    player = grid[x][y];
+                }
                 count = 1;
             }
             x += orientation == Orientation.FORWARD_DIAGONAL ? 1 : -1;
