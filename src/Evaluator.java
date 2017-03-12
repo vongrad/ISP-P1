@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by lema on 11-03-2017.
@@ -24,16 +21,13 @@ public class Evaluator {
     {
         //preparation
 
-        EvaluateColumns(board);
-        EvaluateRows(board);
-
-
+        EvaluateColumns();
+        EvaluateRows();
         diagonal(4);
-
         return 0;
     }
 
-    private void EvaluateRows(Integer[][] board){
+    private void EvaluateRows(){
         int rowSize  = board[0].length,columnSize = board.length;
         Integer[] tempArray= new Integer[4];
         boolean containsOne = false;
@@ -66,10 +60,10 @@ public class Evaluator {
             }
     }
 
-    private void EvaluateColumns(Integer[][] board){
+    private void EvaluateColumns(){
         boolean isPlayerOne = false;
         boolean isPlayerTwo = false;
-        Integer[] tempArray = new Integer[]{0,0,0,0};
+        Integer[] tempArray = new Integer[4];
         int rowSize = board.length,columnSize  = board[0].length;
         if (rowSize > 3)
             for (int y = 0 ; y < columnSize ; y++) {
@@ -99,6 +93,7 @@ public class Evaluator {
                 }
 
                 evaluationScore.addCount(tempArray,tempArray[0]);
+                tempArray = new Integer[4];
             }
 
     }
@@ -118,7 +113,7 @@ public class Evaluator {
         // Slash diagonal
         for(int x = 0; x <= maxX - terminalCount; x++) {
             for(int y = startY; y >= 0; y--) {
-                checkDiagonal(x, y, terminalCount, evaluationScore, Orientation.FORWARD_DIAGONAL);
+                checkDiagonal(x, y, terminalCount, Orientation.FORWARD_DIAGONAL);
             }
             // The initial run (X0), we start from Y top and decrement it to Y0, for the subsequent runs, we only do check Y0
             startY = 0;
@@ -127,7 +122,7 @@ public class Evaluator {
         // Backslash diagonal
         for(int x = maxX - 1; x >= terminalCount - 1 ; x--) {
             for (int y = startY; y >= 0; y--) {
-                checkDiagonal(x, y, terminalCount, evaluationScore, Orientation.BACKWARD_DIAGONAL);
+                checkDiagonal(x, y, terminalCount, Orientation.BACKWARD_DIAGONAL);
             }
             startY = 0;
         }
@@ -138,10 +133,9 @@ public class Evaluator {
      * @param startX - starting X of the diagonal
      * @param startY - starting Y of the diagonal
      * @param terminalCount - number of coins in a row for a winning state
-     * @param score - score holder
      * @param orientation - SLASH / BACKSLASH DIAGONAL
      */
-    public void checkDiagonal(int startX, int startY, int terminalCount, EvaluationScore score, Orientation orientation) {
+    public void checkDiagonal(int startX, int startY, int terminalCount, Orientation orientation) {
 
         int maxX = board.length;
         int maxY = board[0].length;
@@ -177,12 +171,17 @@ public class Evaluator {
                     possibility[i] = board[x][y];
                 }
             }
-            score.addCount(possibility, player);
+            if(player==null)
+            {
+                String hello;
+            }
+
+            evaluationScore.addCount(possibility, player);
         }
 
         // If there are more segments to explore, recursively explore them
         if(startX + terminalCount <= maxX && startY + terminalCount <= maxX) {
-            checkDiagonal(startX + 1, startY + 1, terminalCount, score, orientation);
+            checkDiagonal(startX + 1, startY + 1, terminalCount, orientation);
         }
     }
 

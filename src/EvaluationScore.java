@@ -21,7 +21,7 @@ public class EvaluationScore {
 
     }
 
-    public void addCount(Integer[] possibility, int playerId) {
+    public void addCount(Integer[] possibility, Integer playerId) {
 
         int key = Integer.parseInt(possibilityToString(possibility), 2);
 
