@@ -6,6 +6,14 @@ import java.util.Map;
  */
 public class Evaluator2 {
 
+    /**
+     * Get score for both players in both diagonal directions
+     * @param board - current state of the board
+     * @param terminalCount - number of coins in a row for a winning state
+     * @param playerId - our player id
+     * @param oponentId - oponents player id
+     * @return
+     */
     public EvaluationScore diagonal(Integer[][] board, int terminalCount, int playerId, int oponentId) {
 
         int maxX = board.length;
@@ -34,24 +42,41 @@ public class Evaluator2 {
         return score;
     }
 
+    /**
+     * Get all possible moves for both players in the given diagonal
+     * @param board - current state of the board
+     * @param startX - starting X of the diagonal
+     * @param startY - starting Y of the diagonal
+     * @param terminalCount - number of coins in a row for a winning state
+     * @param score - score holder
+     * @param orientation - SLASH / BACKSLASH DIAGONAL
+     */
     public void checkDiagonal(Integer[][] board, int startX, int startY, int terminalCount, EvaluationScore score, Orientation orientation) {
 
         int maxX = board.length;
         int maxY = board[0].length;
 
-        int segment = Math.min(maxX - startX, maxY - startY) / terminalCount;
+        // Length of the diagonal
+        int segments = Math.min(Orientation.FORWARD_DIAGONAL == orientation ? maxX - startX : startX + 1, maxY - startY) / terminalCount;
 
         Integer player = null;
 
-        for(int s = 0; s < segment; s++) {
+        for(int s = 0; s < segments; s++) {
 
-            Integer[] possibility = new Integer[4];
+            Integer[] possibility = new Integer[terminalCount];
 
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < terminalCount; i++) {
 
+                // Calculate [x, y] relative to the segment
                 int x = startX + (s * terminalCount + (orientation == Orientation.FORWARD_DIAGONAL ? i : -i));
                 int y = startY + (s * terminalCount + i);
 
+                // If the coin cannot be placed on [x, y] because there is nothing at [x, y-1], break
+                if(y > 0 && board[x][y - 1] == null) {
+                    break;
+                }
+
+                // If there are two different players in the segment, break
                 if(player != board[x][y] && player != null) {
                     break;
                 }
@@ -63,7 +88,8 @@ public class Evaluator2 {
             score.addCount(possibility, player);
         }
 
-        if(startX + 4 <= maxX && startY + 4 <= maxX) {
+        // If there are more segments to explore, recursively explore them
+        if(startX + terminalCount <= maxX && startY + terminalCount <= maxX) {
             checkDiagonal(board, startX + 1, startY + 1, terminalCount, score, orientation);
         }
     }
