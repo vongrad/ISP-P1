@@ -92,7 +92,6 @@ public class Evaluator {
                 startIndex = 0;
                 if(board[x1][0]!=null && board[x1][y - 1]== null) { //check if first element of a columns is zero or last
                     for (int y1 = y - 1 ; y1 > -1; y1--) {
-                        startIndex++;
                         if (board[x1][y1] != null) {
                             if (!valueSet)
                             {
@@ -111,9 +110,10 @@ public class Evaluator {
                                 }
                             }
                         }
+                        startIndex++;
                     }
                 }
-                if (startIndex>4 || (startIndex==x))
+                if (startIndex>=4)
                         evaluationScore.addCount(tempArray,tempArray[0]);
                 tempArray = new Integer[4];
             }
