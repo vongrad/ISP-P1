@@ -103,7 +103,7 @@ public class GameLogic implements IGameLogic {
         State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
         state.setPlayer(playerID);
 
-        Action action = miniMaxDecision(state, 5);
+        Action action = miniMaxDecision(state, 6);
 
         return action.getMove();
 
