@@ -33,20 +33,31 @@ public class GameLogic implements IGameLogic {
 
         terminalTester = new TerminalTester(4);
 
+//        //test evaluation
+//        Integer[][] board = new Integer[][]
+//               {
+//                       {1,null,null,null,null,null},
+//                       {2,2,null,null,null,null},
+//                       {1,1,1,2,1,1},
+//                       {2,2,1,2,1,null},
+//                       {2,1,2,1,null,null},
+//                       {2,2,1,1,1,null},
+//                       {1,  2,      2,      2,null,null}};
+
         //test evaluation
         Integer[][] board = new Integer[][]
-               {
-                       {1,null,null,null,null,null},
-                       {2,2,null,null,null,null},
-                       {1,1,1,2,1,1},
-                       {2,2,1,2,1,null},
-                       {2,1,2,1,null,null},
-                       {2,2,1,1,2,null},
-                       {1,  2,      2,      2,null,null}};
+                {
+                        {1,null,null,null,null,null},
+                        {2,null,null,null,null,null},
+                        {2,2,1,null,null,null},
+                        {1,2,1,1,null,null},
+                        {2,1,2,2,1,null},
+                        {null,null,null,null,null,null},
+                        {null,null,null,null,null,null}};
 
 
 
-        State state = new State(board, new Action(5, 2));
+        State state = new State(board, new Action(4, 2));
         boolean myval = stateWin(state);
         state.setPlayer(1);
 
@@ -116,7 +127,7 @@ public class GameLogic implements IGameLogic {
         Action nextAction = null;
 
         for (Action action :actions) {
-            double value = minValue(Result(action, state), depth - 1,-2,2);
+            double value = minValue(Result(action, state), depth - 1,-2,2, depth);
 
             if(value > max) {
                 max = value;
@@ -126,11 +137,12 @@ public class GameLogic implements IGameLogic {
         return nextAction;
     }
 
-    private double maxValue(State state, int depth, double alfa, double beta) {
+    private double maxValue(State state, int depth, double alfa, double beta, int initialDepth) {
 
         // Terminal state check
         if(stateWin(state)) {
-            return Utility(state, false);
+            // Moves that occur at higher depths are preferred as they will happen sooner in the future
+            return Utility(state, false) - ((initialDepth - depth) * 0.0000001);
         }
         else if(stateTie(state)) {
             return Utility(state, true);
@@ -145,7 +157,7 @@ public class GameLogic implements IGameLogic {
         double utility = -2;
 
         for (Action action :actions) {
-            utility = Math.max(utility, minValue(Result(action, state), depth - 1,alfa,beta));
+            utility = Math.max(utility, minValue(Result(action, state), depth - 1,alfa,beta, initialDepth));
             if (utility>= beta)
                 return utility;
             alfa = Math.max(alfa,utility);
@@ -154,11 +166,12 @@ public class GameLogic implements IGameLogic {
         return utility;
     }
 
-    private double minValue(State state, int depth, double alfa, double beta) {
+    private double minValue(State state, int depth, double alfa, double beta, int initialDepth) {
 
         // Terminal state check
         if(stateWin(state)) {
-            return Utility(state, false);
+            // Moves that occur at higher depths are preferred as they will happen sooner in the future
+            return Utility(state, false) - ((initialDepth - depth) * 0.0000001);
         }
         else if(stateTie(state)) {
             return Utility(state, true);
@@ -174,7 +187,7 @@ public class GameLogic implements IGameLogic {
         double utility = 2;
 
         for (Action action :actions) {
-            utility = Math.min(utility, maxValue(Result(action, state), depth - 1,alfa,beta));
+            utility = Math.min(utility, maxValue(Result(action, state), depth - 1,alfa,beta, initialDepth));
             if (utility<= alfa)
                 return utility;
             beta = Math.min(beta,utility);

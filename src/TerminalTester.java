@@ -178,9 +178,9 @@ public class TerminalTester {
                 }
             }
             else{
-                if(grid[x][y] != null) {
-                    player = grid[x][y];
-                }
+                //if(grid[x][y] != null) {
+                player = grid[x][y];
+                //}
                 count = 1;
             }
             x += orientation == Orientation.FORWARD_DIAGONAL ? 1 : -1;
