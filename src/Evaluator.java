@@ -20,9 +20,9 @@ public class Evaluator {
     public double Evaluate()
     {
         //preparation
-//        EvaluateColumns();
+        EvaluateColumns();
 
-        evaluateVertical(4);
+        //evaluateVertical(4);
 
         double score = evaluationScore.evaluateState();
 

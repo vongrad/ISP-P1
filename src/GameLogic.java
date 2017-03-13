@@ -103,7 +103,7 @@ public class GameLogic implements IGameLogic {
         State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
         state.setPlayer(playerID);
 
-        Action action = miniMaxDecision(state, 6);
+        Action action = miniMaxDecision(state, 8);
 
         return action.getMove();
 
@@ -117,7 +117,7 @@ public class GameLogic implements IGameLogic {
         Action nextAction = null;
 
         for (Action action :actions) {
-            double value = minValue(Result(action, state), depth - 1);
+            double value = minValue(Result(action, state), depth - 1,-2,2);
 
             if(value > max) {
                 max = value;
@@ -127,7 +127,7 @@ public class GameLogic implements IGameLogic {
         return nextAction;
     }
 
-    private double maxValue(State state, int depth) {
+    private double maxValue(State state, int depth,double alfa, double beta) {
 
         // Terminal state check
         if(stateWin(state)) {
@@ -149,13 +149,16 @@ public class GameLogic implements IGameLogic {
         double utility = -2;
 
         for (Action action :actions) {
-            utility = Math.max(utility, minValue(Result(action, state), depth - 1));
+            utility = Math.max(utility, minValue(Result(action, state), depth - 1,alfa,beta));
+            if (utility>= beta)
+                return utility;
+            alfa = Math.max(alfa,utility);
         }
 
         return utility;
     }
 
-    private double minValue(State state, int depth) {
+    private double minValue(State state, int depth, double alfa, double beta) {
 
         // Terminal state check
         if(stateWin(state)) {
@@ -178,7 +181,10 @@ public class GameLogic implements IGameLogic {
         double utility = 2;
 
         for (Action action :actions) {
-            utility = Math.min(utility, maxValue(Result(action, state), depth - 1));
+            utility = Math.min(utility, maxValue(Result(action, state), depth - 1,alfa,beta));
+            if (utility<= alfa)
+                return utility;
+            beta = Math.max(beta,utility);
         }
 
         return utility;
