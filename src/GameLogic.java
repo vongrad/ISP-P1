@@ -34,19 +34,24 @@ public class GameLogic implements IGameLogic {
         terminalTester = new TerminalTester(4);
 
         //test evaluation
-//        Integer[][] board = new Integer[][]
-//               {       {2,  2,  1,   1},
-//                       {1,  1,  1,    2},
-//                       {2,  2,  2,    1},
-//                       {1,  null,      null,      null}};
-//
-//
-//
-//        State state = new State(board, new Action(2, 2));
-//        state.setPlayer(1);
-//
-//        evaluator = new Evaluator(state);
-//        evaluator.Evaluate();
+        Integer[][] board = new Integer[][]
+               {
+                       {1,null,null,null,null,null},
+                       {2,2,null,null,null,null},
+                       {1,1,1,2,1,1},
+                       {2,2,1,2,1,null},
+                       {2,1,2,1,null,null},
+                       {2,2,1,1,2,null},
+                       {1,  2,      2,      2,null,null}};
+
+
+
+        State state = new State(board, new Action(5, 2));
+        boolean myval = stateWin(state);
+        state.setPlayer(1);
+
+        evaluator = new Evaluator(state);
+        evaluator.Evaluate();
 
         this.x = x;
         this.y = y;
@@ -64,14 +69,11 @@ public class GameLogic implements IGameLogic {
     // checks whether game is finished, called every click basically
     public Winner gameFinished() {
         if(terminalTester.isWin(gameBoard, lastPlayedColumn)) {
-            System.out.println("Game finished");
             return getPlayer(lastPlayerId);
         }
         else if(terminalTester.isTie(gameBoard)) {
-            System.out.println("Game tied");
             return Winner.TIE;
         }
-        System.out.println("No winner");
         return Winner.NOT_FINISHED;
     }
 
@@ -124,20 +126,17 @@ public class GameLogic implements IGameLogic {
         return nextAction;
     }
 
-    private double maxValue(State state, int depth,double alfa, double beta) {
+    private double maxValue(State state, int depth, double alfa, double beta) {
 
         // Terminal state check
         if(stateWin(state)) {
-            System.out.println("Utility winning");
             return Utility(state, false);
         }
         else if(stateTie(state)) {
-            System.out.println("Utility tie");
             return Utility(state, true);
         }
 
         if(depth == 0) {
-            System.out.println("Cut-off test");
             return Evaluate(state);
         }
 
@@ -159,17 +158,14 @@ public class GameLogic implements IGameLogic {
 
         // Terminal state check
         if(stateWin(state)) {
-            System.out.println("Utility winning");
             return Utility(state, false);
         }
         else if(stateTie(state)) {
-            System.out.println("Utility tie");
             return Utility(state, true);
         }
 
         // Cut-off test
         if (depth == 0) {
-            System.out.println("Cut-off test");
             return Evaluate(state);
         }
 
@@ -181,7 +177,7 @@ public class GameLogic implements IGameLogic {
             utility = Math.min(utility, maxValue(Result(action, state), depth - 1,alfa,beta));
             if (utility<= alfa)
                 return utility;
-            beta = Math.max(beta,utility);
+            beta = Math.min(beta,utility);
         }
 
         return utility;

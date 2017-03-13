@@ -84,11 +84,11 @@ public class EvaluationScore {
     public double evaluateState() {
 
         if(hasWinningState()) {
-            return 1.0;
+            return 0.99999;
         }
 
         if(hasLosingState()) {
-            return -1.0;
+            return -0.99999;
         }
 
         double usSum = 0.0;

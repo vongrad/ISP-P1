@@ -20,10 +20,8 @@ public class Evaluator {
     public double Evaluate()
     {
         //preparation
-        EvaluateColumns();
-
-        //evaluateVertical(4);
-
+        //EvaluateColumns();
+        evaluateVertical(4);
         double score = evaluationScore.evaluateState();
 
         // EvaluateColumns is really fast so we check if we already do not have a definite winning or losing state

@@ -2,6 +2,8 @@
  * Created by Adam Vongrej on 3/6/17.
  */
 
+import javax.print.attribute.standard.PrinterLocation;
+
 /**
  * Class used for checking a terminal (winning) state of the connect-n game
  */
@@ -95,11 +97,8 @@ public class TerminalTester {
                 count++;
             }
             else{
-                count = 1;
-
-                if(grid[x][y] != null) {
-                    player = grid[x][y];
-                }
+                player = grid[x][y];
+                count = player != null ? 1 : 0;
             }
             if(count == this.connectCount) {
                 return true;
@@ -150,9 +149,7 @@ public class TerminalTester {
             x += normalizer;
         }
 
-        if (x<0) {
-            System.out.println("X: " + x + " Y: " );
-        }
+
         int firstY = lastY - normalizer;
 
         Integer player = null;
@@ -172,8 +169,6 @@ public class TerminalTester {
                     return false;
                 }
             }
-
-            System.out.println("X: " + x + " Y: " + y);
 
             if(grid[x][y] == player && player != null) {
                 count++;
@@ -202,7 +197,7 @@ public class TerminalTester {
     private int getLastY(Integer[][] grid, int x) {
         for(int y = 0; y < grid[x].length; y++){
             if(grid[x][y] == null){
-                return y - 1;
+                return Math.max(0, y - 1);
             }
         }
         return grid[x].length - 1;
