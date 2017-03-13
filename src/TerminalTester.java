@@ -17,15 +17,31 @@ public class TerminalTester {
     }
 
     /**
-     * Check if the last turn was terminal
+     * Check if the last was a wining turn
      * @param grid - Game board
      * @param x - Column
      * @return
      */
-    public boolean isTerminal(Integer[][] grid, int x) {
+    public boolean isWin(Integer[][] grid, int x) {
         boolean term =  horizontal(grid, x) || vertical(grid, x) || slashDiagonal(grid, x) || backslashDiagonal(grid, x);
-        System.out.println("Terminal: " + term);
         return term;
+    }
+
+    /**
+     * Check if there are more moves to go with
+     * @param grid
+     * @return
+     */
+    public boolean isTie(Integer[][] grid) {
+
+        int maxY = grid[0].length;
+
+        for(int i = 0; i < grid.length; i++) {
+            if(grid[i][maxY - 1] == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -62,7 +78,9 @@ public class TerminalTester {
 
         int max = orientation == Orientation.HORIZONTAL ? grid.length : grid[x].length;
 
-        int y = 0;
+        int lastY = orientation == Orientation.HORIZONTAL ? getLastY(grid, x) : 0;
+
+        int y = lastY;
 
         for(int i = 0; i < max; i++){
 
@@ -125,7 +143,13 @@ public class TerminalTester {
 
         int normalizer = orientation == Orientation.FORWARD_DIAGONAL ? Math.min(lastY, x) : Math.min(maxX - x, lastY);
 
-        x -= normalizer;
+        if(orientation == Orientation.FORWARD_DIAGONAL) {
+            x -= normalizer;
+        }
+        else {
+            x += normalizer;
+        }
+
         if (x<0) {
             System.out.println("X: " + x + " Y: " );
         }
@@ -138,18 +162,25 @@ public class TerminalTester {
 
         for(int y = firstY; y <= maxY; y++){
 
-            if(x < 0) {
-                String test = "";
+            if(orientation == Orientation.FORWARD_DIAGONAL) {
+                if(x >= terminalX) {
+                    return false;
+                }
             }
-
-            if(x <= terminalX || count == this.connectCount){
-                return count == this.connectCount;
+            else {
+                if(x <= terminalX){
+                    return false;
+                }
             }
 
             System.out.println("X: " + x + " Y: " + y);
 
             if(grid[x][y] == player && player != null) {
                 count++;
+
+                if(count == this.connectCount) {
+                    return true;
+                }
             }
             else{
                 if(grid[x][y] != null) {
@@ -174,6 +205,6 @@ public class TerminalTester {
                 return y - 1;
             }
         }
-        return 0;
+        return grid[x].length - 1;
     }
 }

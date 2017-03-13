@@ -63,12 +63,15 @@ public class GameLogic implements IGameLogic {
 
     // checks whether game is finished, called every click basically
     public Winner gameFinished() {
-        if(terminalTester.isTerminal(gameBoard, lastPlayedColumn)) {
+        if(terminalTester.isWin(gameBoard, lastPlayedColumn)) {
+            System.out.println("Game finished");
             return getPlayer(lastPlayerId);
         }
-
-        // TODO: handle tie
-
+        else if(terminalTester.isTie(gameBoard)) {
+            System.out.println("Game tied");
+            return Winner.TIE;
+        }
+        System.out.println("No winner");
         return Winner.NOT_FINISHED;
     }
 
@@ -100,7 +103,7 @@ public class GameLogic implements IGameLogic {
         State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
         state.setPlayer(playerID);
 
-        Action action = miniMaxDecision(state, 8);
+        Action action = miniMaxDecision(state, 5);
 
         return action.getMove();
 
@@ -114,7 +117,7 @@ public class GameLogic implements IGameLogic {
         Action nextAction = null;
 
         for (Action action :actions) {
-            double value = minValue(Result(action, state), depth--);
+            double value = minValue(Result(action, state), depth - 1);
 
             if(value > max) {
                 max = value;
@@ -126,14 +129,19 @@ public class GameLogic implements IGameLogic {
 
     private double maxValue(State state, int depth) {
 
-        System.out.println(depth);
-        if(TermnialState(state)) {
-            return Utility(state);
+        // Terminal state check
+        if(stateWin(state)) {
+            System.out.println("Utility winning");
+            return Utility(state, false);
+        }
+        else if(stateTie(state)) {
+            System.out.println("Utility tie");
+            return Utility(state, true);
         }
 
         if(depth == 0) {
-            double value = Evaluate(state);
-            return value;
+            System.out.println("Cut-off test");
+            return Evaluate(state);
         }
 
         List<Action> actions = Actions(state);
@@ -149,17 +157,25 @@ public class GameLogic implements IGameLogic {
 
     private double minValue(State state, int depth) {
 
-        if(TermnialState(state)) {
-            return Utility(state);
+        // Terminal state check
+        if(stateWin(state)) {
+            System.out.println("Utility winning");
+            return Utility(state, false);
+        }
+        else if(stateTie(state)) {
+            System.out.println("Utility tie");
+            return Utility(state, true);
         }
 
+        // Cut-off test
         if (depth == 0) {
+            System.out.println("Cut-off test");
             return Evaluate(state);
         }
 
         List<Action> actions = Actions(state);
 
-        double utility =2;
+        double utility = 2;
 
         for (Action action :actions) {
             utility = Math.min(utility, maxValue(Result(action, state), depth - 1));
@@ -178,19 +194,17 @@ public class GameLogic implements IGameLogic {
         return evaluator.Evaluate();
     }
 
+    private double Utility(State state, boolean tie) {
 
+        if(tie) {
+            return 0;
+        }
 
-
-
-    private double Utility(State state) {
         if(state.getAction().getPlayer() == playerID) {
             return 1.0;
         }
-        else if(state.getAction().getPlayer() == oponentID){
-            return -1.0;
-        }
         else {
-            return 0.0;
+            return -1.0;
         }
     }
 
@@ -234,12 +248,12 @@ public class GameLogic implements IGameLogic {
         return myBoard;
     }
 
-    // Adam Won or Board Full
-    private boolean TermnialState(State state) {
-        if(terminalTester.isTerminal(state.getBoard(), state.getAction().getMove())) {
-            return true;
-        };
-        return false;
+    private boolean stateWin(State state) {
+        return terminalTester.isWin(state.getBoard(), state.getAction().getMove());
+    }
+
+    private boolean stateTie(State state) {
+        return terminalTester.isTie(state.getBoard());
     }
 
     /**

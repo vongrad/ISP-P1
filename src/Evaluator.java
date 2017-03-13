@@ -20,7 +20,9 @@ public class Evaluator {
     public double Evaluate()
     {
         //preparation
-        EvaluateColumns();
+//        EvaluateColumns();
+
+        evaluateVertical(4);
 
         double score = evaluationScore.evaluateState();
 
@@ -116,6 +118,73 @@ public class Evaluator {
                 tempArray = new Integer[4];
             }
 
+    }
+
+    /**
+     * Evaluate all possibilities for both players vertically
+     * This function goes through only the X
+     * @param terminalCount
+     */
+    private void evaluateVertical(int terminalCount) {
+
+        int maxX = board.length;
+
+        for(int x = 0; x < maxX; x++) {
+            evaluateVertical(x, 0, terminalCount);
+        }
+    }
+
+    /**
+     * Evaluate all possibilities for both players vertically
+     * This function goes recursively through Y and trying out all possible combinations recursively
+     * @param x
+     * @param startY
+     * @param terminalCount
+     */
+    private void evaluateVertical(int x, int startY, int terminalCount) {
+
+        int maxY = board[0].length;
+
+        int segments = maxY / terminalCount;
+
+        Integer player = null;
+
+        segments:
+        for (int s = 0; s < segments; s++) {
+
+            Integer[] possibility = new Integer[4];
+
+            for(int i = 0; i < terminalCount; i++) {
+                int y = startY + (s * terminalCount) + i;
+
+                // First square [x, 0] empty
+                if(player == null && board[x][y] == null) {
+                    continue segments;
+                }
+
+                // If there are two different players in the segment, break
+                if(player != board[x][y] && player != null && board[x][y] != null) {
+                    continue segments;
+                }
+                else {
+                    // This should never happen
+                    if(board[x][y] != null) {
+                        player = board[x][y];
+                    }
+                    possibility[i] = board[x][y];
+                }
+
+            }
+
+            if(player != null) {
+                evaluationScore.addCount(possibility, player);
+            }
+        }
+
+        // If there are more segments to explore, recursively explore them
+        if(startY + terminalCount + 1 <= maxY) {
+            evaluateVertical(x, startY + 1, terminalCount);
+        }
     }
 
     /**
