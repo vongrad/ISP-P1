@@ -11,8 +11,8 @@ public class Evaluator {
     private EvaluationScore evaluationScore;
 
     public Evaluator(State state){
-        minPlayerId = state.getPlayer();
-        maxPlayerId = 3 - minPlayerId;
+        maxPlayerId = state.getPlayer(); // we get the state after min made moves
+        minPlayerId = 3 - maxPlayerId;
         board = state.getBoard();
         evaluationScore = new EvaluationScore(maxPlayerId,minPlayerId);
     }
