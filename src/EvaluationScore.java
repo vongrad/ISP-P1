@@ -84,11 +84,11 @@ public class EvaluationScore {
     public double evaluateState() {
 
         if(hasWinningState()) {
-            return 0.99999;
+            return 0.999;
         }
 
         if(hasLosingState()) {
-            return -0.99999;
+            return -0.999;
         }
 
         double usSum = 0.0;
@@ -116,17 +116,6 @@ public class EvaluationScore {
         }
 
         double opponentProportion = opponentSum / Double.MAX_VALUE;
-//
-//        if(usSum == opponentSum) {
-//            return 0;
-//        }
-//        else if(usSum > opponentSum) {
-//            return 1 - (opponentSum / usSum);
-//        }
-//        else {
-//            return -1  + (usSum / opponentSum);
-//
-//        }
 
         return usProportion - opponentProportion;
     }

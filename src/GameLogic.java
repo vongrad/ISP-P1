@@ -10,7 +10,6 @@ import java.util.List;
 public class GameLogic implements IGameLogic {
 
     private TerminalTester terminalTester;
-    private Evaluator evaluator;
 
     private int x = 0;
     private int y = 0;
@@ -18,52 +17,20 @@ public class GameLogic implements IGameLogic {
     private int playerID;
     private int oponentID;
 
-    private boolean finished = false;
     private Integer[][] gameBoard;
 
     private int lastPlayedColumn = 0;
     private int lastPlayerId;
 
     public GameLogic() {
-        //TODO Write your implementation for this method
+
     }
 
     // Gives the board size and your id
     public void initializeGame(int x, int y, int playerID) {
 
         terminalTester = new TerminalTester(4);
-
-//        //test evaluation
-//        Integer[][] board = new Integer[][]
-//               {
-//                       {1,null,null,null,null,null},
-//                       {2,2,null,null,null,null},
-//                       {1,1,1,2,1,1},
-//                       {2,2,1,2,1,null},
-//                       {2,1,2,1,null,null},
-//                       {2,2,1,1,1,null},
-//                       {1,  2,      2,      2,null,null}};
-
-        //test evaluation
-        Integer[][] board = new Integer[][]
-                {
-                        {1,null,null,null,null,null},
-                        {2,null,null,null,null,null},
-                        {2,2,1,null,null,null},
-                        {1,2,1,1,null,null},
-                        {2,1,2,2,1,null},
-                        {null,null,null,null,null,null},
-                        {null,null,null,null,null,null}};
-
-
-
-        State state = new State(board, new Action(4, 2));
-        boolean myval = stateWin(state);
-        state.setPlayer(1);
-
-        evaluator = new Evaluator(state);
-        evaluator.Evaluate();
-
+        // indicate board size
         this.x = x;
         this.y = y;
 
@@ -71,8 +38,8 @@ public class GameLogic implements IGameLogic {
         this.playerID = playerID;
         this.oponentID = playerID == 1 ? 2 : 1;
 
+        // initialize empty board
         gameBoard = new Integer[x][y];
-        //TODO Write your implementation for this method
     }
 
 
@@ -99,9 +66,7 @@ public class GameLogic implements IGameLogic {
 
         this.lastPlayedColumn = x;
         this.lastPlayerId = playerID;
-
         int index = 0;
-
         while (index < y){
             if (gameBoard[x][index] == null) {
                 gameBoard[x][index] = playerID;
@@ -112,7 +77,6 @@ public class GameLogic implements IGameLogic {
     }
 
     public int decideNextMove() {
-
         State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
         state.setPlayer(playerID);
         Action action = miniMaxDecision(state, 8);
@@ -141,8 +105,10 @@ public class GameLogic implements IGameLogic {
 
         // Terminal state check
         if(stateWin(state)) {
+            double value = Utility(state, false);
             // Moves that occur at higher depths are preferred as they will happen sooner in the future
-            return Utility(state, false) - ((initialDepth - depth) * 0.0000001);
+            if (value>0) return value - ((initialDepth - depth) * 0.0000001);
+            else return value + ((initialDepth - depth) * 0.0000001);
         }
         else if(stateTie(state)) {
             return Utility(state, true);
@@ -153,30 +119,27 @@ public class GameLogic implements IGameLogic {
         }
 
         List<Action> actions = Actions(state);
-
         double utility = -2;
-
         for (Action action :actions) {
             utility = Math.max(utility, minValue(Result(action, state), depth - 1,alfa,beta, initialDepth));
             if (utility>= beta)
                 return utility;
             alfa = Math.max(alfa,utility);
         }
-
         return utility;
     }
 
     private double minValue(State state, int depth, double alfa, double beta, int initialDepth) {
-
         // Terminal state check
         if(stateWin(state)) {
+            double value = Utility(state, false);
             // Moves that occur at higher depths are preferred as they will happen sooner in the future
-            return Utility(state, false) - ((initialDepth - depth) * 0.0000001);
+            if (value>0) return value - ((initialDepth - depth) * 0.0000001);
+            else return value + ((initialDepth - depth) * 0.0000001);
         }
         else if(stateTie(state)) {
             return Utility(state, true);
         }
-
         // Cut-off test
         if (depth == 0) {
             return Evaluate(state);
@@ -192,7 +155,6 @@ public class GameLogic implements IGameLogic {
                 return utility;
             beta = Math.min(beta,utility);
         }
-
         return utility;
     }
 
@@ -229,8 +191,6 @@ public class GameLogic implements IGameLogic {
     private State Result(Action action, State state) {
 
         int index = 0;
-
-        //Integer[][] board = state.getBoard().clone();
         Integer [][] board = CopyBoard(state.getBoard());
 
         while (index < y){

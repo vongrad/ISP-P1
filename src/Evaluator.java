@@ -1,5 +1,3 @@
-import java.util.*;
-
 /**
  * Created by lema on 11-03-2017.
  */
@@ -20,22 +18,21 @@ public class Evaluator {
     public double Evaluate()
     {
         //preparation
-        //EvaluateColumns();
-        evaluateVertical(4);
+        evaluateVerticals();
         double score = evaluationScore.evaluateState();
 
-        // EvaluateColumns is really fast so we check if we already do not have a definite winning or losing state
-        if (Math.abs(score) == 1) {
+        // evaluateVerticals is really fast so we check if we already do not have a definite winning or losing state
+        if (Math.abs(score) == 0.999) {
             return score;
         }
 
-        EvaluateRows();
+        evaluateHorizontals();
         diagonal(4);
 
         return evaluationScore.evaluateState();
     }
 
-    private void EvaluateRows(){
+    private void evaluateHorizontals(){
         int y = board[0].length,x  = board.length;
         Integer[] tempArray= new Integer[4];
         boolean containsOne = false;
@@ -78,7 +75,7 @@ public class Evaluator {
             }
     }
 
-    private void EvaluateColumns(){
+    private void evaluateVerticals(){
 
         Integer[] tempArray = new Integer[4];
         int startIndex = 0;
