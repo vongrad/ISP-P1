@@ -79,7 +79,7 @@ public class GameLogic implements IGameLogic {
     public int decideNextMove() {
         State state = new State(gameBoard, new Action(lastPlayedColumn, playerID));
         state.setPlayer(playerID);
-        Action action = miniMaxDecision(state, 8);
+        Action action = miniMaxDecision(state, 9);
         return action.getMove();
 
     }
@@ -164,7 +164,7 @@ public class GameLogic implements IGameLogic {
      * @return the Action which contains evaluated value INTEGER and move itself
      */
     private double Evaluate(State state) {
-        Evaluator evaluator = new Evaluator(state);
+        Evaluator evaluator = new Evaluator(state, playerID);
         return evaluator.Evaluate();
     }
 
