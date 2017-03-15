@@ -43,16 +43,16 @@ public class EvaluationScore {
         Map<Integer, Integer> score = new HashMap<>();
 
         score.put(0, 0);        // 0000
-        score.put(1, 10);       // 1000
-        score.put(2, 30);       // 0100
+        score.put(1, 4);       // 1000
+        score.put(2, 15);       // 0100
         score.put(3, 50);       // 1100
-        score.put(4, 30);       // 0010
+        score.put(4, 15);       // 0010
         score.put(5, 40);       // 1010
         score.put(6, 75);       // 0110
         score.put(7, 1000);     // 1110
-        score.put(8, 10);       // 0001
+        score.put(8, 4);       // 0001
         score.put(9, 30);       // 1001
-        score.put(10, 30);      // 0101
+        score.put(10, 40);      // 0101
         score.put(11, 1000);    // 1101
         score.put(12, 50);      // 0011
         score.put(13, 1000);    // 1011
